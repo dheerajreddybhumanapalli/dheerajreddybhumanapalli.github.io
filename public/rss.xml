@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Dheeraj Reddy Bhumanapalli — Blog</title>
-    <link>https://dheerajreddybhumanapalli.github.io/blog/</link>
-    <description>AI news and technical newsletters by Dheeraj Reddy Bhumanapalli.</description>
+    <title>Dheeraj Reddy Bhumanapalli — Articles</title>
+    <link>https://dheerajreddybhumanapalli.github.io/articles/</link>
+    <description>Articles by Dheeraj Reddy Bhumanapalli — notes on AI, software engineering, and things worth writing down.</description>
     <language>en</language>
   </channel>
 </rss>

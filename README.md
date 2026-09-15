@@ -1,6 +1,6 @@
-# Personal Website + Technical Newsletter — Dheeraj Reddy Bhumanapalli
+# Personal Website + Articles — Dheeraj Reddy Bhumanapalli
 
-A personal website built with **Next.js 15**, **React 19**, and **Tailwind CSS v4**. It is a fully static multi-page application exported for hosting on **GitHub Pages**.
+A personal website built with **React 19**, **Vite**, **React Router**, and **Tailwind CSS v4**. It is a fully static multi-page application prerendered for hosting on **GitHub Pages**. No Next.js.
 
 **Live site:** [https://dheerajreddybhumanapalli.github.io/](https://dheerajreddybhumanapalli.github.io/)
 
@@ -10,17 +10,15 @@ A personal website built with **Next.js 15**, **React 19**, and **Tailwind CSS v
 
 Two jobs, one static site (no backend):
 
-1. **Personal website — "know about me".** The home page stays as-is: Hero (name, title, bio, photo), Projects, Experience, Contact, plus Resume. No dedicated `/about` page planned — updating `data/portfolio.ts`, `components/Hero.tsx`, and `components/Contact.tsx` is enough.
-2. **News / technical newsletter platform.** The `/blog` section becomes a **newsletter-style feed**: issue-numbered (oldest published post = Issue #1, newest = highest number), newest-first listing plus a year-grouped **archive**, per-issue pages with prev/next + related issues, tag pages (`ai-news`, `newsletter`, …), search, sitemap, and **RSS-only distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
-
-See `DESIGN_SUGGESTIONS.md` for the phased roadmap (newsletter feed first, reader-experience polish next, explicit non-goals).
+1. **Personal website — "know about me".** The home page: Hero (name, title, bio, photo, stats), About, Skills, Projects, Experience, Contact, plus Resume. Update content in `data/portfolio.ts` and `data/site.ts` — no need to touch components.
+2. **Articles — "what I'm thinking".** The `/articles` section publishes **articles on any topic**: newest-first listing, per-article pages with prev/next + related articles, tag pages, search, sitemap, and **RSS distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
 
 ---
 
 ## Features
 
-- Single-page home layout with smooth in-page navigation (Home, Projects, Experience, Contact)
-- Newsletter (`/blog`) with per-issue pages, tag pages, search, year-grouped archive (planned), issue numbering oldest = #1 (planned), RSS, sitemap, and per-issue SEO metadata
+- Single-page home layout with smooth in-page navigation (Home, About, Skills, Projects, Experience, Contact)
+- Articles (`/articles`) with per-article pages, tag pages, search, reading progress bar, RSS, sitemap, and per-article SEO metadata
 - Dark / light theme toggle with system preference support
 - Scroll-triggered section highlighting in the navbar
 - Expandable project cards with tech stack tags
@@ -36,12 +34,13 @@ See `DESIGN_SUGGESTIONS.md` for the phased roadmap (newsletter feed first, reade
 
 | Layer | Technology |
 |-------|------------|
-| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
+| Framework | [React 19](https://react.dev/) + [Vite](https://vite.dev/) |
+| Routing | [React Router](https://reactrouter.com/) |
 | UI | [React 19](https://react.dev/) |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
 | Animation | [Framer Motion](https://www.framer.com/motion/) |
 | Icons | [Lucide React](https://lucide.dev/) |
-| Theming | [next-themes](https://github.com/pacocoursey/next-themes) |
+| Theming | Custom `ThemeProvider` (context + localStorage) |
 | Language | TypeScript |
 | Hosting | GitHub Pages (`gh-pages` branch) |
 
@@ -76,7 +75,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
@@ -84,30 +83,27 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start Next.js dev server with hot reload |
-| `npm run build` | Production static export for **local** preview |
-| `npm run build:pages` | Production static export for **GitHub Pages** (same as `build`; kept for compatibility) |
-| `npm run start` | Serve the `out/` folder locally after `npm run build` |
-| `npm run lint` | Run ESLint |
+| `npm run dev` | Start Vite dev server with hot reload |
+| `npm run build` | Production build → `dist/` (posts catalog + RSS + prerender + sitemap) |
+| `npm run preview` | Serve the `dist/` folder locally after `npm run build` |
+| `npm run lint` | Run TypeScript check (`tsc --noEmit`) |
 | `npm run deploy` | Build for GitHub Pages and publish to the `gh-pages` branch |
 
 ### Local production preview
 
 ```bash
 npm run build
-npm run start
+npm run preview
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-> **Note:** `next start` does **not** work with this project because it uses `output: "export"` (static HTML). Use `npm run start`, which serves the `out/` directory with `serve`.
+Open the printed localhost URL (default [http://localhost:4173](http://localhost:4173)).
 
 ### Development vs production preview vs deploy
 
 | Goal | Command | URL |
 |------|---------|-----|
-| Active development | `npm run dev` | `http://localhost:3000/` |
-| Test production build locally | `npm run build && npm run start` | `http://localhost:3000/` |
+| Active development | `npm run dev` | `http://localhost:5173/` |
+| Test production build locally | `npm run build && npm run preview` | `http://localhost:4173/` |
 | Publish to GitHub Pages | `npm run deploy` | `https://dheerajreddybhumanapalli.github.io/` |
 
 ---
@@ -131,8 +127,8 @@ npm run deploy
 
 This runs:
 
-1. `predeploy` → `npm run build:pages` — static export with no base path (user site is served from the domain root)
-2. `deploy` → `gh-pages -d out --nojekyll` — pushes the `out/` folder to the `gh-pages` branch (the `--nojekyll` flag is required so GitHub Pages serves the `_next/` directory)
+1. `predeploy` → `npm run build` — posts catalog + RSS + Vite build + per-route prerender + sitemap (user site is served from the domain root)
+2. `deploy` → `gh-pages -d dist --nojekyll` — pushes the `dist/` folder to the `gh-pages` branch (the `--nojekyll` flag is required so GitHub Pages serves asset files as-is)
 
 You should see `Published` when it succeeds. Allow 1–2 minutes for GitHub Pages to update.
 
@@ -144,7 +140,7 @@ This repo is a user site (`<username>.github.io`), so GitHub Pages serves it fro
 https://dheerajreddybhumanapalli.github.io/
 ```
 
-That means `next.config.ts` uses **no `basePath` / `assetPrefix`**. (A `basePath` like `/portfolio` is only needed for project sites served at `<username>.github.io/<repo>/`.)
+That means `vite.config.mts` uses **no `base`** other than `"/"`. (A `base` like `/portfolio` is only needed for project sites served at `<username>.github.io/<repo>/`.)
 
 All static assets and links use `assetPath()` from `lib/utils.ts` so paths keep working if a base path is ever reintroduced.
 
@@ -154,48 +150,56 @@ All static assets and links use `assetPath()` from `lib/utils.ts` so paths keep 
 
 ```
 dheerajreddybhumanapalli.github.io/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx          # Root layout, fonts, metadata, theme provider
-│   ├── page.tsx            # Home page — composes all sections
-│   ├── blog/
-│   │   ├── page.tsx        # Blog listing (search + tag filter)
-│   │   ├── [slug]/page.tsx # Blog post page (SEO meta + JSON-LD)
-│   │   └── tag/[tag]/page.tsx # Tag listing page
-│   ├── sitemap.ts          # Static sitemap.xml
-│   └── globals.css         # Tailwind import + CSS custom properties (themes)
+├── index.html              # SPA shell (fonts, meta, theme boot, #root)
+├── src/
+│   ├── main.tsx            # Entry: BrowserRouter + ThemeProvider + App
+│   ├── App.tsx             # Routes: /, /articles, /articles/:slug, /articles/tag/:tag, *
+│   ├── globals.css         # Tailwind import + CSS custom properties (themes)
+│   └── pages/              # Home, ArticlesIndex, ArticlePage, TagPage, NotFound
 ├── components/             # React components
-│   ├── Navbar.tsx          # Route-aware nav (anchors on home, links on blog)
-│   ├── Footer.tsx          # Shared footer (Blog, RSS, Resume links)
-│   ├── Hero.tsx            # Profile intro, CTA buttons
+│   ├── Navbar.tsx          # Route-aware nav (anchors on home, links on articles)
+│   ├── Footer.tsx          # Sitemap columns, socials, back-to-top
+│   ├── Hero.tsx            # Profile intro, stats, CTAs, socials
+│   ├── About.tsx           # About strip + currently/previously/exploring
+│   ├── Skills.tsx          # Skill-group grid
 │   ├── Projects.tsx        # Projects section wrapper
-│   ├── ProjectCard.tsx     # Expandable project card
+│   ├── ProjectCard.tsx     # Expandable project card (featured variant)
 │   ├── Experience.tsx      # Experience section wrapper
 │   ├── ExperienceTimeline.tsx
-│   ├── Contact.tsx         # Email/phone with copy buttons
-│   ├── BlogCard.tsx        # Blog post preview card
-│   ├── BlogList.tsx        # Client-side search + tag filter for /blog
-│   ├── LatestPosts.tsx     # Home page "Latest posts" teaser section
+│   ├── Contact.tsx         # Email/phone/social cards with copy buttons
+│   ├── SocialLinks.tsx     # GitHub/LinkedIn icon buttons
+│   ├── ArticleCard.tsx     # Article preview card
+│   ├── ArticleList.tsx     # Search + tag filter + result counts for /articles
+│   ├── LatestArticles.tsx  # Home page "Latest articles" teaser section
 │   ├── ShareButtons.tsx    # X / LinkedIn / copy-link share (no backend)
-│   ├── PostNav.tsx         # Prev/next navigation + related posts
-│   ├── SectionHeading.tsx  # Reusable section title
+│   ├── ArticleNav.tsx      # Prev/next cards + related articles
+│   ├── SectionHeading.tsx  # Eyebrow + title + accent bar + subtitle
 │   ├── FadeIn.tsx          # Framer Motion scroll animation
-│   └── ThemeProvider.tsx   # next-themes wrapper
+│   ├── SEO.tsx             # Per-route title/meta/canonical/JSON-LD at runtime
+│   ├── ScrollToTop.tsx     # Reset scroll on route change
+│   └── ThemeProvider.tsx   # Custom theme context (replaces next-themes)
 ├── content/
-│   └── blog/               # Blog posts in Markdown (see _template.md)
+│   └── articles/           # Articles in Markdown, any topic (see _template.md)
 │       └── _template.md    # Frontmatter + formatting reference (ignored by build)
 ├── data/
-│   └── portfolio.ts        # Projects & experience content (edit here)
+│   ├── portfolio.ts        # Projects, experience, skills, about (edit here)
+│   └── site.ts             # SITE_URL, name, email, socials, resume/RSS URLs
 ├── scripts/
-│   └── generate-rss.mjs    # Builds public/rss.xml before every build
+│   ├── generate-articles.mjs # Builds lib/articles-generated.json before dev/build
+│   ├── generate-rss.mjs    # Builds public/rss.xml before every build
+│   ├── prerender.mjs       # Writes one HTML file per route into dist/ (+ /blog/* shims)
+│   └── generate-sitemap.mjs # Writes dist/sitemap.xml + dist/robots.txt
 ├── lib/
+│   ├── articles.ts         # Query layer over articles-generated.json (no I/O)
+│   ├── articles-generated.json # Build-time article catalog (committed)
 │   └── utils.ts            # cn(), assetPath(), basePath helpers
-├── public/                 # Static assets (copied to out/ on build)
+├── public/                 # Static assets (copied to dist/ on build)
 │   ├── profile_image.jpg
 │   ├── resume.pdf
 │   ├── favicon.ico
-│   ├── robots.txt
 │   └── .nojekyll           # Disables Jekyll on GitHub Pages
-├── next.config.ts          # Static export + GitHub Pages config
+├── docs/                   # Per-topic docs (architecture, authoring, deploy, roadmap)
+├── vite.config.mts         # Vite + React Router + GitHub Pages config
 ├── postcss.config.mjs      # Tailwind PostCSS plugin
 ├── tsconfig.json           # TypeScript config (@/* path alias)
 ├── package.json
@@ -226,24 +230,23 @@ export interface CardItem {
 
 After editing, run `npm run dev` to preview, then `npm run deploy` to publish.
 
-### Publishing a newsletter issue
+### Publishing an article (any topic)
 
-1. Copy `content/blog/_template.md` to a new file, e.g. `content/blog/vllm-vs-sglang-first-look.md`.
-   - Filename rules: lowercase letters, numbers, and hyphens only. The filename becomes the URL (`/blog/vllm-vs-sglang-first-look/`).
+1. Copy `content/articles/_template.md` to a new file, e.g. `content/articles/vllm-vs-sglang-first-look.md`.
+   - Filename rules: lowercase letters, numbers, and hyphens only. The filename becomes the URL (`/articles/vllm-vs-sglang-first-look/`).
    - Files starting with `_` (like `_template.md`) are ignored.
 2. Fill in the frontmatter:
-   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (e.g. `[ai-news, newsletter]` — use `ai-news` for news roundups, `newsletter` for hands-on technical notes)
-   - Optional: `image` (path to a custom OG image in `public/`), `draft: true` (hides the post until you remove it)
-   - Issue numbers are **planned** (auto-assigned oldest = Issue #1); do not add an `issue` field today.
+   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (free-form, any topic, e.g. `[ai, tutorial]`)
+   - Optional: `image` (path to a custom OG image in `public/`), `draft: true` (hides the article until you remove it)
 3. Write the body in Markdown (headings, code blocks, tables, quotes all supported).
-4. Preview with `npm run dev` → `http://localhost:3000/blog/your-slug/`.
+4. Preview with `npm run dev` → `http://localhost:5173/articles/your-slug/`.
 5. Publish with `npm run deploy`. The RSS feed (`/rss.xml`) and sitemap regenerate automatically on every build. RSS is the subscription channel — there is no email signup on the static site.
 
 > After deploying, submit `https://dheerajreddybhumanapalli.github.io/sitemap.xml` in Google Search Console and Bing Webmaster Tools so new posts get indexed.
 
-### Contact info
+### Contact info and socials
 
-Edit the `contactInfo` array in `components/Contact.tsx`.
+Edit `socials` and `SITE_EMAIL` in `data/site.ts` (used by Hero, Contact, and Footer). Phone details live in the `contactMethods` array in `components/Contact.tsx`.
 
 ### Hero section
 
@@ -258,16 +261,16 @@ Replace files in `public/`:
 
 ### Site metadata (title, description)
 
-Edit `export const metadata` in `app/layout.tsx`.
+Edit the `<SEO ... />` props in `src/pages/` (per-route) and the defaults in `index.html`.
 
 ---
 
 ## Styling & Theming
 
-- **Tailwind v4** is configured via `postcss.config.mjs` and imported in `app/globals.css`.
+- **Tailwind v4** is configured via `postcss.config.mjs` and imported in `src/globals.css`.
 - Theme colors are CSS custom properties in `:root` (light) and `.dark` (dark).
 - The accent color is emerald green (`--accent`).
-- Fonts: **Inter** (body) and **JetBrains Mono** (mono), loaded via `next/font/google` in `app/layout.tsx`.
+- Fonts: **Inter** (body) and **JetBrains Mono** (mono), loaded via Google Fonts `<link>` tags in `index.html`.
 - Use `cn()` from `lib/utils.ts` to merge Tailwind class names.
 
 ---
@@ -281,42 +284,33 @@ Edit `export const metadata` in `app/layout.tsx`.
 
 ---
 
-## Roadmap (personal site + newsletter)
+## Roadmap (personal site + articles)
 
-Personal site: **keep as-is** — content edits only (`data/portfolio.ts`, `Hero`, `Contact`, `resume.pdf`).
+Personal site: content edits only (`data/portfolio.ts`, `data/site.ts`, `resume.pdf`).
 
-Newsletter feed (all static-export compatible, details in `DESIGN_SUGGESTIONS.md`):
+Articles backlog (all static-hosting compatible):
 
-- **Phase 1 — newsletter feed:** auto issue numbers (oldest = #1) in `lib/posts.ts`; Issue badges on cards + post pages; year-grouped archive on `/blog`; rebrand UI labels Blog → Newsletter (keep `/blog` URLs + RSS path); "Latest issues" teaser on home; RSS channel copy → newsletter.
-- **Phase 2 — reader experience:** reading progress bar + table of contents, code-block copy button, breadcrumbs, default OG social image fallback.
-- **Phase 3 — discovery:** featured/pinned issue, richer footer, search shortcut + result counts, theme-color meta + touch icon.
+- **Reader experience:** table of contents on article pages, code-block copy button, breadcrumbs, default OG social image fallback.
+- **Discovery:** featured/pinned article, search shortcut + result counts, `apple-touch-icon.png`.
 - **Non-goals while on GitHub Pages static hosting:** email subscriptions/backend, comments, view counts/likes, API routes/server actions/middleware. Email would require an external service (e.g. Buttondown/Substack embed) — RSS stays the subscription channel unless that decision changes.
 
 ---
 
 ## Troubleshooting
 
-### `next start` fails with `output: export` error
-
-Expected. This app is statically exported. Use:
-
-```bash
-npm run build && npm run start
-```
-
 ### Blank page or broken styles on GitHub Pages
 
-Make sure you deploy with `npm run deploy` so the `out/` folder is rebuilt and pushed to the `gh-pages` branch. If styles/JS are broken, open devtools and check for 404s under `_next/static/` — that usually means the deployed HTML references a stale `basePath` or the `--nojekyll` flag was missing.
+Make sure you deploy with `npm run deploy` so the `dist/` folder is rebuilt and pushed to the `gh-pages` branch. If styles/JS are broken, open devtools and check for 404s under `/assets/` — that usually means the deployed HTML references a stale `base` or the `--nojekyll` flag was missing.
 
 ### CSS/JS 404 — unstyled page or invisible content
 
-GitHub Pages runs Jekyll by default, which **ignores folders starting with `_`** (like `_next/`). The deploy script must include `--nojekyll`:
+GitHub Pages runs Jekyll by default, which **ignores folders starting with `_`**. The deploy script must include `--nojekyll`:
 
 ```json
-"deploy": "gh-pages -d out --nojekyll"
+"deploy": "gh-pages -d dist --nojekyll"
 ```
 
-Without this, HTML loads but all `_next/static/` assets return 404, so Tailwind styles and React/Framer Motion never run.
+Without this, HTML loads but static assets may return 404, so Tailwind styles and React/Framer Motion never run.
 
 ### Assets 404 on GitHub Pages but work locally
 

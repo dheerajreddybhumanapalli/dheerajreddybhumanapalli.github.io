@@ -1,5 +1,5 @@
 /**
- * Generates public/rss.xml from content/blog/*.md (full post content).
+ * Generates public/rss.xml from content/articles/*.md (full post content).
  * Runs before every build (see prebuild / prebuild:pages in package.json).
  */
 import fs from "node:fs";
@@ -9,7 +9,7 @@ import { remark } from "remark";
 import remarkHtml from "remark-html";
 
 const SITE_URL = "https://dheerajreddybhumanapalli.github.io";
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+const POSTS_DIR = path.join(process.cwd(), "content", "articles");
 const OUT_PATH = path.join(process.cwd(), "public", "rss.xml");
 
 function escapeXml(value) {
@@ -60,8 +60,8 @@ const items = posts
   .map(
     (post) => `    <item>
       <title>${escapeXml(post.title)}</title>
-      <link>${SITE_URL}/blog/${post.slug}/</link>
-      <guid isPermaLink="true">${SITE_URL}/blog/${post.slug}/</guid>
+      <link>${SITE_URL}/articles/${post.slug}/</link>
+      <guid isPermaLink="true">${SITE_URL}/articles/${post.slug}/</guid>
       <pubDate>${new Date(`${post.date}T00:00:00Z`).toUTCString()}</pubDate>
       <description>${escapeXml(post.summary)}</description>
       <content:encoded>${cdata(post.contentHtml)}</content:encoded>
@@ -73,9 +73,9 @@ ${post.tags.map((t) => `      <category>${escapeXml(t)}</category>`).join("\n")}
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Dheeraj Reddy Bhumanapalli — Blog</title>
-    <link>${SITE_URL}/blog/</link>
-    <description>AI news and technical newsletters by Dheeraj Reddy Bhumanapalli.</description>
+    <title>Dheeraj Reddy Bhumanapalli — Articles</title>
+    <link>${SITE_URL}/articles/</link>
+    <description>Articles by Dheeraj Reddy Bhumanapalli — notes on AI, software engineering, and things worth writing down.</description>
     <language>en</language>
 ${items ? items + "\n" : ""}  </channel>
 </rss>

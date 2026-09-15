@@ -6,16 +6,12 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# build output (vite)
+/dist/
 /build
 
 # typescript
 *.tsbuildinfo
-
-# vercel
-.vercel
 
 # misc
 .DS_Store
