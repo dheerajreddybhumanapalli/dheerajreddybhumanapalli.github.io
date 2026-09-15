@@ -1,15 +1,26 @@
-# Portfolio — Dheeraj Reddy Bhumanapalli
+# Personal Website + Technical Newsletter — Dheeraj Reddy Bhumanapalli
 
-A personal portfolio site built with **Next.js 15**, **React 19**, and **Tailwind CSS v4**. It is a fully static multi-page application exported for hosting on **GitHub Pages**.
+A personal website built with **Next.js 15**, **React 19**, and **Tailwind CSS v4**. It is a fully static multi-page application exported for hosting on **GitHub Pages**.
 
 **Live site:** [https://dheerajreddybhumanapalli.github.io/](https://dheerajreddybhumanapalli.github.io/)
+
+---
+
+## Vision
+
+Two jobs, one static site (no backend):
+
+1. **Personal website — "know about me".** The home page stays as-is: Hero (name, title, bio, photo), Projects, Experience, Contact, plus Resume. No dedicated `/about` page planned — updating `data/portfolio.ts`, `components/Hero.tsx`, and `components/Contact.tsx` is enough.
+2. **News / technical newsletter platform.** The `/blog` section becomes a **newsletter-style feed**: issue-numbered (oldest published post = Issue #1, newest = highest number), newest-first listing plus a year-grouped **archive**, per-issue pages with prev/next + related issues, tag pages (`ai-news`, `newsletter`, …), search, sitemap, and **RSS-only distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
+
+See `DESIGN_SUGGESTIONS.md` for the phased roadmap (newsletter feed first, reader-experience polish next, explicit non-goals).
 
 ---
 
 ## Features
 
 - Single-page home layout with smooth in-page navigation (Home, Projects, Experience, Contact)
-- Blog (`/blog`) with per-post pages, tag pages, search, RSS, sitemap, and per-post SEO metadata
+- Newsletter (`/blog`) with per-issue pages, tag pages, search, year-grouped archive (planned), issue numbering oldest = #1 (planned), RSS, sitemap, and per-issue SEO metadata
 - Dark / light theme toggle with system preference support
 - Scroll-triggered section highlighting in the navbar
 - Expandable project cards with tech stack tags
@@ -215,17 +226,18 @@ export interface CardItem {
 
 After editing, run `npm run dev` to preview, then `npm run deploy` to publish.
 
-### Publishing a blog post
+### Publishing a newsletter issue
 
 1. Copy `content/blog/_template.md` to a new file, e.g. `content/blog/vllm-vs-sglang-first-look.md`.
    - Filename rules: lowercase letters, numbers, and hyphens only. The filename becomes the URL (`/blog/vllm-vs-sglang-first-look/`).
    - Files starting with `_` (like `_template.md`) are ignored.
 2. Fill in the frontmatter:
-   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (e.g. `[ai-news, newsletter]`)
+   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (e.g. `[ai-news, newsletter]` — use `ai-news` for news roundups, `newsletter` for hands-on technical notes)
    - Optional: `image` (path to a custom OG image in `public/`), `draft: true` (hides the post until you remove it)
+   - Issue numbers are **planned** (auto-assigned oldest = Issue #1); do not add an `issue` field today.
 3. Write the body in Markdown (headings, code blocks, tables, quotes all supported).
 4. Preview with `npm run dev` → `http://localhost:3000/blog/your-slug/`.
-5. Publish with `npm run deploy`. The RSS feed (`/rss.xml`) and sitemap regenerate automatically on every build.
+5. Publish with `npm run deploy`. The RSS feed (`/rss.xml`) and sitemap regenerate automatically on every build. RSS is the subscription channel — there is no email signup on the static site.
 
 > After deploying, submit `https://dheerajreddybhumanapalli.github.io/sitemap.xml` in Google Search Console and Bing Webmaster Tools so new posts get indexed.
 
@@ -266,6 +278,19 @@ Edit `export const metadata` in `app/layout.tsx`.
 |--------|---------|
 | `master` | Source code (active development) |
 | `gh-pages` | Built static site deployed by GitHub Pages (auto-updated by `npm run deploy`) |
+
+---
+
+## Roadmap (personal site + newsletter)
+
+Personal site: **keep as-is** — content edits only (`data/portfolio.ts`, `Hero`, `Contact`, `resume.pdf`).
+
+Newsletter feed (all static-export compatible, details in `DESIGN_SUGGESTIONS.md`):
+
+- **Phase 1 — newsletter feed:** auto issue numbers (oldest = #1) in `lib/posts.ts`; Issue badges on cards + post pages; year-grouped archive on `/blog`; rebrand UI labels Blog → Newsletter (keep `/blog` URLs + RSS path); "Latest issues" teaser on home; RSS channel copy → newsletter.
+- **Phase 2 — reader experience:** reading progress bar + table of contents, code-block copy button, breadcrumbs, default OG social image fallback.
+- **Phase 3 — discovery:** featured/pinned issue, richer footer, search shortcut + result counts, theme-color meta + touch icon.
+- **Non-goals while on GitHub Pages static hosting:** email subscriptions/backend, comments, view counts/likes, API routes/server actions/middleware. Email would require an external service (e.g. Buttondown/Substack embed) — RSS stays the subscription channel unless that decision changes.
 
 ---
 
