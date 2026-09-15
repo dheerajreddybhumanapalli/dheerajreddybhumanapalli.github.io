@@ -7,16 +7,11 @@
 /coverage
 
 # build output (vite)
-# next.js
 /dist/
-/out/
 /build
 
 # typescript
 *.tsbuildinfo
-
-# vercel
-.vercel
 
 # misc
 .DS_Store

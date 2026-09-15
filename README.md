@@ -13,8 +13,6 @@ Two jobs, one static site (no backend):
 1. **Personal website — "know about me".** The home page stays as-is: Hero (name, title, bio, photo), Projects, Experience, Contact, plus Resume. No dedicated `/about` page planned — updating `data/portfolio.ts`, `components/Hero.tsx`, and `components/Contact.tsx` is enough.
 2. **News / technical newsletter platform.** The `/blog` section becomes a **newsletter-style feed**: issue-numbered (oldest published post = Issue #1, newest = highest number), newest-first listing plus a year-grouped **archive**, per-issue pages with prev/next + related issues, tag pages (`ai-news`, `newsletter`, …), search, sitemap, and **RSS-only distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
 
-See `DESIGN_SUGGESTIONS.md` for the phased roadmap (newsletter feed first, reader-experience polish next, explicit non-goals).
-
 ---
 
 ## Features
@@ -195,8 +193,8 @@ dheerajreddybhumanapalli.github.io/
 │   ├── profile_image.jpg
 │   ├── resume.pdf
 │   ├── favicon.ico
-│   ├── robots.txt
 │   └── .nojekyll           # Disables Jekyll on GitHub Pages
+├── docs/                   # Per-topic docs (architecture, authoring, deploy, roadmap)
 ├── vite.config.mts         # Vite + React Router + GitHub Pages config
 ├── postcss.config.mjs      # Tailwind PostCSS plugin
 ├── tsconfig.json           # TypeScript config (@/* path alias)
@@ -287,7 +285,7 @@ Edit the `<SEO ... />` props in `src/pages/` (per-route) and the defaults in `in
 
 Personal site: **keep as-is** — content edits only (`data/portfolio.ts`, `Hero`, `Contact`, `resume.pdf`).
 
-Newsletter feed (all static-export compatible, details in `DESIGN_SUGGESTIONS.md`):
+Newsletter feed (planned, all static-export compatible):
 
 - **Phase 1 — newsletter feed:** auto issue numbers (oldest = #1) in `lib/posts.ts`; Issue badges on cards + post pages; year-grouped archive on `/blog`; rebrand UI labels Blog → Newsletter (keep `/blog` URLs + RSS path); "Latest issues" teaser on home; RSS channel copy → newsletter.
 - **Phase 2 — reader experience:** reading progress bar + table of contents, code-block copy button, breadcrumbs, default OG social image fallback.

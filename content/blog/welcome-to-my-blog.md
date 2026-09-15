@@ -3,7 +3,7 @@ title: "Welcome to my blog"
 date: "2026-09-11"
 summary: "Why I started writing about AI news and technical newsletters — and what you can expect to find here."
 tags: [newsletter]
-draft: false
+draft: true
 ---
 
 I spend a lot of time exploring new AI tools — testing LLM inference setups, RAG pipelines, and agentic workflows. Until now, most of those notes lived on my machine. This blog is where I'll publish them.
