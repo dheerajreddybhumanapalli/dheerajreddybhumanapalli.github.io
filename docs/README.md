@@ -7,5 +7,5 @@ for setup and content editing, see `README.md`.
 | Doc | What it covers |
 |-----|----------------|
 | [architecture.md](architecture.md) | Stack, build pipeline, routing, prerendering, theming |
-| [blog-authoring.md](blog-authoring.md) | Writing and publishing a post: frontmatter rules, drafts, images, RSS/sitemap behavior |
+| [article-authoring.md](article-authoring.md) | Writing and publishing an article: frontmatter rules, drafts, images, RSS/sitemap behavior |
 | [deployment.md](deployment.md) | GitHub Pages setup, deploy flow, SPA fallback, cache notes |

@@ -5,10 +5,14 @@ import { ExperienceTimeline } from "@/components/ExperienceTimeline";
 
 export function Experience() {
   return (
-    <section id="experience" className="scroll-mt-20 bg-card/30 px-6 py-24">
+    <section
+      id="experience"
+      className="scroll-mt-20 border-y border-border bg-subtle/60 px-6 py-20"
+    >
       <div className="mx-auto max-w-5xl">
         <FadeIn>
           <SectionHeading
+            eyebrow="Career"
             title="Experience"
             subtitle="Professional roles across AI engineering and production software."
           />

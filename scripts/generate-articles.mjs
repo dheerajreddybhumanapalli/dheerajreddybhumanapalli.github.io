@@ -1,12 +1,12 @@
 /**
- * Pre-renders content/blog/*.md to lib/posts-generated.json.
+ * Pre-renders content/articles/*.md to lib/articles-generated.json.
  *
  * Runs before `vite dev` (predev) and `vite build` (prebuild) so the
- * client-side catalog in lib/posts.ts never performs I/O.
+ * client-side catalog in lib/articles.ts never performs I/O.
  *
- * Rules (same as the old Next.js version):
+ * Rules:
  * - Filename = slug: lowercase letters, numbers, hyphens only.
- * - `_`-prefixed files are skipped; `draft: true` hides the post.
+ * - `_`-prefixed files are skipped; `draft: true` hides the article.
  * - Required frontmatter: title, date (YYYY-MM-DD), summary, tags (list).
  */
 import fs from "node:fs";
@@ -15,8 +15,8 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import remarkHtml from "remark-html";
 
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
-const OUT_PATH = path.join(process.cwd(), "lib", "posts-generated.json");
+const POSTS_DIR = path.join(process.cwd(), "content", "articles");
+const OUT_PATH = path.join(process.cwd(), "lib", "articles-generated.json");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function readingMinutesFor(text) {
@@ -27,12 +27,12 @@ function readingMinutesFor(text) {
 function parseTags(value, slug) {
   if (!Array.isArray(value)) {
     throw new Error(
-      `Post "${slug}" has invalid frontmatter: "tags" must be a list, e.g. tags: [ai-news, newsletter]`
+      `Article "${slug}" has invalid frontmatter: "tags" must be a list, e.g. tags: [ai, tutorial]`
     );
   }
   const tags = value.map((t) => String(t).trim().toLowerCase());
   if (tags.some((t) => t.length === 0)) {
-    throw new Error(`Post "${slug}" has an empty tag in frontmatter "tags"`);
+    throw new Error(`Article "${slug}" has an empty tag in frontmatter "tags"`);
   }
   return [...new Set(tags)];
 }
@@ -41,7 +41,7 @@ function validateFrontmatter(slug, data) {
   const { title, date, summary, tags, image, draft } = data;
 
   if (typeof title !== "string" || title.trim().length === 0) {
-    throw new Error(`Post "${slug}" has invalid frontmatter: "title" is required`);
+    throw new Error(`Article "${slug}" has invalid frontmatter: "title" is required`);
   }
   if (
     typeof date !== "string" ||
@@ -49,17 +49,17 @@ function validateFrontmatter(slug, data) {
     Number.isNaN(Date.parse(date))
   ) {
     throw new Error(
-      `Post "${slug}" has invalid frontmatter: "date" must be YYYY-MM-DD`
+      `Article "${slug}" has invalid frontmatter: "date" must be YYYY-MM-DD`
     );
   }
   if (typeof summary !== "string" || summary.trim().length === 0) {
-    throw new Error(`Post "${slug}" has invalid frontmatter: "summary" is required`);
+    throw new Error(`Article "${slug}" has invalid frontmatter: "summary" is required`);
   }
   if (image !== undefined && (typeof image !== "string" || image.trim().length === 0)) {
-    throw new Error(`Post "${slug}" has invalid frontmatter: "image" must be a non-empty path`);
+    throw new Error(`Article "${slug}" has invalid frontmatter: "image" must be a non-empty path`);
   }
   if (draft !== undefined && typeof draft !== "boolean") {
-    throw new Error(`Post "${slug}" has invalid frontmatter: "draft" must be true or false`);
+    throw new Error(`Article "${slug}" has invalid frontmatter: "draft" must be true or false`);
   }
 
   return {
@@ -72,14 +72,14 @@ function validateFrontmatter(slug, data) {
   };
 }
 
-const posts = [];
+const articles = [];
 if (fs.existsSync(POSTS_DIR)) {
   for (const fileName of fs.readdirSync(POSTS_DIR)) {
     if (!fileName.endsWith(".md") || fileName.startsWith("_")) continue;
     const slug = fileName.replace(/\.md$/, "");
     if (!SLUG_PATTERN.test(slug)) {
       throw new Error(
-        `Invalid post filename "${fileName}": use lowercase letters, numbers, and hyphens only (e.g. my-first-post.md)`
+        `Invalid article filename "${fileName}": use lowercase letters, numbers, and hyphens only (e.g. my-first-post.md)`
       );
     }
     const raw = fs.readFileSync(path.join(POSTS_DIR, fileName), "utf8");
@@ -87,7 +87,7 @@ if (fs.existsSync(POSTS_DIR)) {
     const frontmatter = validateFrontmatter(slug, data);
     if (frontmatter.draft === true) continue;
     const rendered = await remark().use(remarkHtml).process(content);
-    posts.push({
+    articles.push({
       ...frontmatter,
       slug,
       contentHtml: String(rendered),
@@ -95,7 +95,7 @@ if (fs.existsSync(POSTS_DIR)) {
     });
   }
 }
-posts.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+articles.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
-fs.writeFileSync(OUT_PATH, `${JSON.stringify(posts, null, 2)}\n`);
-console.log(`posts: wrote ${posts.length} post(s) to lib/posts-generated.json`);
+fs.writeFileSync(OUT_PATH, `${JSON.stringify(articles, null, 2)}\n`);
+console.log(`articles: wrote ${articles.length} article(s) to lib/articles-generated.json`);

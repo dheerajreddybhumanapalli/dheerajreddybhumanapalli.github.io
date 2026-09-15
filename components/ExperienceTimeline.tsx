@@ -1,3 +1,4 @@
+import { Building2 } from "lucide-react";
 import type { CardItem } from "@/data/portfolio";
 
 interface ExperienceTimelineProps {
@@ -6,33 +7,42 @@ interface ExperienceTimelineProps {
 
 export function ExperienceTimeline({ experiences }: ExperienceTimelineProps) {
   return (
-    <div className="relative space-y-12">
+    <ol className="relative space-y-10">
       <div
         aria-hidden
-        className="absolute left-[7px] top-2 bottom-2 w-px bg-border sm:left-[11px]"
+        className="absolute bottom-2 left-[19px] top-2 w-px bg-gradient-to-b from-accent/60 via-border to-transparent sm:left-[23px]"
       />
 
       {experiences.map((company) => (
-        <div key={company.title} className="relative pl-8 sm:pl-12">
-          <div className="absolute left-0 top-1.5 h-4 w-4 rounded-full border-2 border-accent bg-background sm:h-5 sm:w-5" />
+        <li key={company.title} className="relative pl-12 sm:pl-14">
+          <span
+            aria-hidden
+            className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-2xl border border-accent/30 bg-card text-accent shadow-sm sm:h-12 sm:w-12"
+          >
+            <Building2 className="h-5 w-5" />
+          </span>
 
-          <h3 className="text-xl font-semibold">{company.title}</h3>
+          <h3 className="pt-1 text-xl font-semibold tracking-tight sm:pt-2">
+            {company.title}
+          </h3>
 
-          <div className="mt-6 space-y-8">
+          <div className="mt-4 space-y-5">
             {company.roles.map((role) => (
               <div
                 key={`${company.title}-${role.designation}-${role.duration}`}
-                className="rounded-xl border border-border bg-card p-5"
+                className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-accent/30 sm:p-6"
               >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-medium">{role.designation}</p>
-                  <p className="font-mono text-sm text-muted">{role.duration}</p>
+                  <p className="rounded-full bg-accent/10 px-3 py-1 font-mono text-xs font-medium text-accent">
+                    {role.duration}
+                  </p>
                 </div>
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-4 space-y-2.5">
                   {role.description.map((point) => (
                     <li
                       key={point}
-                      className="flex gap-2 text-sm leading-relaxed text-muted"
+                      className="flex gap-2.5 text-sm leading-relaxed text-muted"
                     >
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                       {point}
@@ -42,8 +52,8 @@ export function ExperienceTimeline({ experiences }: ExperienceTimelineProps) {
               </div>
             ))}
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }

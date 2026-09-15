@@ -1,22 +1,22 @@
 # Architecture
 
-Static portfolio + blog. **React 19 + Vite + React Router**, TypeScript strict,
+Static portfolio + articles. **React 19 + Vite + React Router**, TypeScript strict,
 Tailwind CSS v4. No Next.js, no backend. Hosting: GitHub Pages (`gh-pages` branch).
 
 ## Build pipeline
 
 ```
-content/blog/*.md
-  ├─ scripts/generate-posts.mjs ──→ lib/posts-generated.json (committed)
-  └─ scripts/generate-rss.mjs ────→ public/rss.xml (committed)
+content/articles/*.md
+  ├─ scripts/generate-articles.mjs ─→ lib/articles-generated.json (committed)
+  └─ scripts/generate-rss.mjs ──────→ public/rss.xml (committed)
                                           │
 vite build ──→ dist/ (JS/CSS + copies of public/)
-  ├─ scripts/prerender.mjs ───────→ dist/**/index.html + dist/404.html
+  ├─ scripts/prerender.mjs ─────────→ dist/**/index.html + dist/404.html (+ /blog/* redirect shims)
   └─ scripts/generate-sitemap.mjs → dist/sitemap.xml + dist/robots.txt
 ```
 
 `npm run build` runs the whole chain (`prebuild` → `vite build` → prerender →
-sitemap). `npm run dev` runs `generate-posts` first (`predev`), then Vite.
+sitemap). `npm run dev` runs `generate-articles` first (`predev`), then Vite.
 
 ## Rendering model
 
@@ -25,9 +25,10 @@ The browser app is a client-side SPA (`src/main.tsx` mounts `App` with
 one static HTML file per route into `dist/`:
 
 - Each file carries route-specific `<title>`, meta, canonical, Open Graph, and
-  (for posts) JSON-LD head tags — mirroring what `<SEO>` sets at runtime.
+  (for articles) JSON-LD head tags — mirroring what `<SEO>` sets at runtime.
 - Each file carries a static content snapshot inside `#root` for no-JS readers
   and crawlers; the SPA replaces it on boot.
+- Old `/blog/*` paths get meta-refresh redirect shims to `/articles/*`.
 - Unknown paths fall back to `dist/404.html` (GitHub Pages serves it on 404s).
 
 ## Routing
@@ -36,28 +37,28 @@ one static HTML file per route into `dist/`:
 
 | Path | Page |
 |------|------|
-| `/` | `src/pages/Home.tsx` (Hero, Projects, Experience, LatestPosts, Contact) |
-| `/blog` | `src/pages/BlogIndex.tsx` (search + tag filter via `BlogList`) |
-| `/blog/:slug` | `src/pages/BlogPost.tsx` (article + share + prev/next + related) |
-| `/blog/tag/:tag` | `src/pages/TagPage.tsx` |
+| `/` | `src/pages/Home.tsx` (Hero, About, Skills, Projects, Experience, LatestArticles, Contact) |
+| `/articles` | `src/pages/ArticlesIndex.tsx` (search + tag filter via `ArticleList`) |
+| `/articles/:slug` | `src/pages/ArticlePage.tsx` (article + share + prev/next + related, reading progress bar) |
+| `/articles/tag/:tag` | `src/pages/TagPage.tsx` |
 | `*` | `src/pages/NotFound.tsx` |
 
 `ScrollToTop` resets scroll on route changes but preserves `#anchor` behavior
 for the home-section nav.
 
-## Blog data layer
+## Article data layer
 
-`lib/posts.ts` performs **no I/O** — it is a pure query layer over the
-build-time catalog in `lib/posts-generated.json`:
+`lib/articles.ts` performs **no I/O** — it is a pure query layer over the
+build-time catalog in `lib/articles-generated.json`:
 
-- `getAllPosts()` — published posts, newest first
-- `getPostBySlug(slug)` — full post incl. pre-rendered `contentHtml` (sync)
+- `getAllArticles()` — published articles, newest first
+- `getArticleBySlug(slug)` — full article incl. pre-rendered `contentHtml` (sync)
 - `getAllTags()` — alphabetical tag list
-- `getRelatedPosts(slug, limit)` — overlap-ranked, excludes self
+- `getRelatedArticles(slug, limit)` — overlap-ranked, excludes self
 
 Validation (filename = slug, required frontmatter) lives in
-`scripts/generate-posts.mjs`, which throws on violations. See
-[blog-authoring.md](blog-authoring.md).
+`scripts/generate-articles.mjs`, which throws on violations. See
+[article-authoring.md](article-authoring.md).
 
 The catalog JSON is committed so a fresh clone typechecks and builds without
 running scripts first; `predev`/`prebuild` regenerate it anyway.
@@ -69,6 +70,12 @@ system preference on first visit). It toggles the `.dark` class on
 `<html>`; `index.html` inlines a boot script that applies the saved theme
 before first paint to avoid a flash. Dark mode styling needs Tailwind's
 `@custom-variant dark` (see `src/globals.css`).
+
+## Content & site data
+
+- `data/portfolio.ts` — projects/experience/skills/about (`CardItem`/`Role`/`SkillGroup`). Edit content here, not in components.
+- `data/site.ts` — `SITE_URL`, name, role, email, social links, resume/RSS URLs. Social URLs are placeholders — ask the user for real ones before publishing.
+- `components/SocialLinks.tsx` — GitHub/LinkedIn icon buttons.
 
 ## Static assets
 

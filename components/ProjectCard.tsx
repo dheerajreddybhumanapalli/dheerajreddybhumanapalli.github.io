@@ -1,55 +1,81 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, FolderGit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/data/portfolio";
 
 interface ProjectCardProps {
   title: string;
   role: Role;
+  featured?: boolean;
 }
 
 function parseTechStack(designation: string): string[] {
   return designation.split(",").map((tech) => tech.trim()).filter(Boolean);
 }
 
-export function ProjectCard({ title, role }: ProjectCardProps) {
+export function ProjectCard({ title, role, featured = false }: ProjectCardProps) {
   const [open, setOpen] = useState(false);
   const techStack = parseTechStack(role.designation);
 
   return (
     <article
       className={cn(
-        "group rounded-2xl border border-border bg-card p-6 transition-all duration-300",
-        "hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
+        "group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 sm:p-7",
+        "hover:-translate-y-1 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/10",
+        featured && "border-accent/25 bg-gradient-to-br from-card via-card to-accent/5"
       )}
     >
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-start justify-between gap-4 text-left"
-        aria-expanded={open}
-      >
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold leading-snug">{title}</h3>
-          <p className="mt-1 text-sm text-muted">{role.duration}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <span className="mt-0.5 rounded-xl bg-accent/10 p-2.5 text-accent transition-colors group-hover:bg-accent/15">
+            <FolderGit2 className="h-5 w-5" aria-hidden />
+          </span>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold leading-snug tracking-tight">
+                {title}
+              </h3>
+              {featured && (
+                <span className="rounded-full bg-accent/15 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-accent">
+                  Featured
+                </span>
+              )}
+            </div>
+            <p className="mt-1.5 font-mono text-xs text-muted sm:text-sm">
+              {role.duration}
+            </p>
+          </div>
         </div>
-        <ChevronDown
-          className={cn(
-            "mt-1 h-5 w-5 shrink-0 text-muted transition-transform duration-300",
-            open && "rotate-180"
-          )}
-        />
-      </button>
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-label={open ? "Collapse details" : "Expand details"}
+          className="shrink-0 rounded-lg border border-border p-2 text-muted transition-all hover:border-accent/50 hover:text-accent"
+        >
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform duration-300",
+              open && "rotate-180"
+            )}
+          />
+        </button>
+      </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {techStack.map((tech) => (
+        {techStack.slice(0, open ? undefined : 6).map((tech) => (
           <span
             key={tech}
-            className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-xs text-muted"
+            className="rounded-full border border-border bg-background px-2.5 py-1 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-foreground"
           >
             {tech}
           </span>
         ))}
+        {!open && techStack.length > 6 && (
+          <span className="rounded-full bg-subtle px-2.5 py-1 font-mono text-xs text-muted">
+            +{techStack.length - 6} more
+          </span>
+        )}
       </div>
 
       <div
@@ -59,11 +85,11 @@ export function ProjectCard({ title, role }: ProjectCardProps) {
         )}
       >
         <div className="overflow-hidden">
-          <ul className="space-y-2 border-t border-border pt-4">
+          <ul className="space-y-2.5 border-t border-border pt-4">
             {role.description.map((point) => (
               <li
                 key={point}
-                className="flex gap-2 text-sm leading-relaxed text-muted"
+                className="flex gap-2.5 text-sm leading-relaxed text-muted"
               >
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                 {point}

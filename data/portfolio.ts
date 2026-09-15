@@ -9,6 +9,35 @@ export interface CardItem {
   roles: Role[];
 }
 
+export interface SkillGroup {
+  label: string;
+  skills: string[];
+}
+
+export const about: string[] = [
+  "I'm an AI Software Engineer working at the intersection of Generative AI and production software. My day-to-day spans RAG pipelines, agentic workflows with LangGraph, and benchmarking LLM inference under real GPU constraints.",
+  "Before AI took over my calendar, I built large-scale data platforms — ingestion pipelines over a billion records, Elasticsearch at scale, and the unglamorous work of keeping production systems alive. That grounding shapes how I build AI systems: evaluated, observable, and shippable.",
+];
+
+export const skillGroups: SkillGroup[] = [
+  {
+    label: "Languages",
+    skills: ["Python", "TypeScript", "SQL", "Bash"],
+  },
+  {
+    label: "AI / ML",
+    skills: ["LangGraph", "LangChain", "RAG", "PyTorch", "Hugging Face", "vLLM", "FAISS", "ChromaDB"],
+  },
+  {
+    label: "Backend",
+    skills: ["FastAPI", "Django", "React", "Celery", "RabbitMQ", "PostgreSQL"],
+  },
+  {
+    label: "Data & Infra",
+    skills: ["Elasticsearch", "AWS", "Docker", "Selenium", "Playwright", "Prometheus", "Grafana"],
+  },
+];
+
 export const projects: CardItem[] = [
   {
     title: "Political Contributions Compliance Platform",

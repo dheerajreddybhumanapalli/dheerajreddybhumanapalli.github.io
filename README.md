@@ -1,4 +1,4 @@
-# Personal Website + Technical Newsletter — Dheeraj Reddy Bhumanapalli
+# Personal Website + Articles — Dheeraj Reddy Bhumanapalli
 
 A personal website built with **React 19**, **Vite**, **React Router**, and **Tailwind CSS v4**. It is a fully static multi-page application prerendered for hosting on **GitHub Pages**. No Next.js.
 
@@ -10,15 +10,15 @@ A personal website built with **React 19**, **Vite**, **React Router**, and **Ta
 
 Two jobs, one static site (no backend):
 
-1. **Personal website — "know about me".** The home page stays as-is: Hero (name, title, bio, photo), Projects, Experience, Contact, plus Resume. No dedicated `/about` page planned — updating `data/portfolio.ts`, `components/Hero.tsx`, and `components/Contact.tsx` is enough.
-2. **News / technical newsletter platform.** The `/blog` section becomes a **newsletter-style feed**: issue-numbered (oldest published post = Issue #1, newest = highest number), newest-first listing plus a year-grouped **archive**, per-issue pages with prev/next + related issues, tag pages (`ai-news`, `newsletter`, …), search, sitemap, and **RSS-only distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
+1. **Personal website — "know about me".** The home page: Hero (name, title, bio, photo, stats), About, Skills, Projects, Experience, Contact, plus Resume. Update content in `data/portfolio.ts` and `data/site.ts` — no need to touch components.
+2. **Articles — "what I'm thinking".** The `/articles` section publishes **articles on any topic**: newest-first listing, per-article pages with prev/next + related articles, tag pages, search, sitemap, and **RSS distribution** (`/rss.xml`). No email-subscription backend while on static hosting — RSS is the subscription channel.
 
 ---
 
 ## Features
 
-- Single-page home layout with smooth in-page navigation (Home, Projects, Experience, Contact)
-- Newsletter (`/blog`) with per-issue pages, tag pages, search, year-grouped archive (planned), issue numbering oldest = #1 (planned), RSS, sitemap, and per-issue SEO metadata
+- Single-page home layout with smooth in-page navigation (Home, About, Skills, Projects, Experience, Contact)
+- Articles (`/articles`) with per-article pages, tag pages, search, reading progress bar, RSS, sitemap, and per-article SEO metadata
 - Dark / light theme toggle with system preference support
 - Scroll-triggered section highlighting in the navbar
 - Expandable project cards with tech stack tags
@@ -153,41 +153,45 @@ dheerajreddybhumanapalli.github.io/
 ├── index.html              # SPA shell (fonts, meta, theme boot, #root)
 ├── src/
 │   ├── main.tsx            # Entry: BrowserRouter + ThemeProvider + App
-│   ├── App.tsx             # Routes: /, /blog, /blog/:slug, /blog/tag/:tag, *
+│   ├── App.tsx             # Routes: /, /articles, /articles/:slug, /articles/tag/:tag, *
 │   ├── globals.css         # Tailwind import + CSS custom properties (themes)
-│   └── pages/              # Home, BlogIndex, BlogPost, TagPage, NotFound
+│   └── pages/              # Home, ArticlesIndex, ArticlePage, TagPage, NotFound
 ├── components/             # React components
-│   ├── Navbar.tsx          # Route-aware nav (anchors on home, links on blog)
-│   ├── Footer.tsx          # Shared footer (Blog, RSS, Resume links)
-│   ├── Hero.tsx            # Profile intro, CTA buttons
+│   ├── Navbar.tsx          # Route-aware nav (anchors on home, links on articles)
+│   ├── Footer.tsx          # Sitemap columns, socials, back-to-top
+│   ├── Hero.tsx            # Profile intro, stats, CTAs, socials
+│   ├── About.tsx           # About strip + currently/previously/exploring
+│   ├── Skills.tsx          # Skill-group grid
 │   ├── Projects.tsx        # Projects section wrapper
-│   ├── ProjectCard.tsx     # Expandable project card
+│   ├── ProjectCard.tsx     # Expandable project card (featured variant)
 │   ├── Experience.tsx      # Experience section wrapper
 │   ├── ExperienceTimeline.tsx
-│   ├── Contact.tsx         # Email/phone with copy buttons
-│   ├── BlogCard.tsx        # Blog post preview card
-│   ├── BlogList.tsx        # Client-side search + tag filter for /blog
-│   ├── LatestPosts.tsx     # Home page "Latest posts" teaser section
+│   ├── Contact.tsx         # Email/phone/social cards with copy buttons
+│   ├── SocialLinks.tsx     # GitHub/LinkedIn icon buttons
+│   ├── ArticleCard.tsx     # Article preview card
+│   ├── ArticleList.tsx     # Search + tag filter + result counts for /articles
+│   ├── LatestArticles.tsx  # Home page "Latest articles" teaser section
 │   ├── ShareButtons.tsx    # X / LinkedIn / copy-link share (no backend)
-│   ├── PostNav.tsx         # Prev/next navigation + related posts
-│   ├── SectionHeading.tsx  # Reusable section title
+│   ├── ArticleNav.tsx      # Prev/next cards + related articles
+│   ├── SectionHeading.tsx  # Eyebrow + title + accent bar + subtitle
 │   ├── FadeIn.tsx          # Framer Motion scroll animation
 │   ├── SEO.tsx             # Per-route title/meta/canonical/JSON-LD at runtime
 │   ├── ScrollToTop.tsx     # Reset scroll on route change
 │   └── ThemeProvider.tsx   # Custom theme context (replaces next-themes)
 ├── content/
-│   └── blog/               # Blog posts in Markdown (see _template.md)
+│   └── articles/           # Articles in Markdown, any topic (see _template.md)
 │       └── _template.md    # Frontmatter + formatting reference (ignored by build)
 ├── data/
-│   └── portfolio.ts        # Projects & experience content (edit here)
+│   ├── portfolio.ts        # Projects, experience, skills, about (edit here)
+│   └── site.ts             # SITE_URL, name, email, socials, resume/RSS URLs
 ├── scripts/
-│   ├── generate-posts.mjs  # Builds lib/posts-generated.json before dev/build
+│   ├── generate-articles.mjs # Builds lib/articles-generated.json before dev/build
 │   ├── generate-rss.mjs    # Builds public/rss.xml before every build
-│   ├── prerender.mjs       # Writes one HTML file per route into dist/
+│   ├── prerender.mjs       # Writes one HTML file per route into dist/ (+ /blog/* shims)
 │   └── generate-sitemap.mjs # Writes dist/sitemap.xml + dist/robots.txt
 ├── lib/
-│   ├── posts.ts            # Query layer over posts-generated.json (no I/O)
-│   ├── posts-generated.json # Build-time post catalog (committed)
+│   ├── articles.ts         # Query layer over articles-generated.json (no I/O)
+│   ├── articles-generated.json # Build-time article catalog (committed)
 │   └── utils.ts            # cn(), assetPath(), basePath helpers
 ├── public/                 # Static assets (copied to dist/ on build)
 │   ├── profile_image.jpg
@@ -226,24 +230,23 @@ export interface CardItem {
 
 After editing, run `npm run dev` to preview, then `npm run deploy` to publish.
 
-### Publishing a newsletter issue
+### Publishing an article (any topic)
 
-1. Copy `content/blog/_template.md` to a new file, e.g. `content/blog/vllm-vs-sglang-first-look.md`.
-   - Filename rules: lowercase letters, numbers, and hyphens only. The filename becomes the URL (`/blog/vllm-vs-sglang-first-look/`).
+1. Copy `content/articles/_template.md` to a new file, e.g. `content/articles/vllm-vs-sglang-first-look.md`.
+   - Filename rules: lowercase letters, numbers, and hyphens only. The filename becomes the URL (`/articles/vllm-vs-sglang-first-look/`).
    - Files starting with `_` (like `_template.md`) are ignored.
 2. Fill in the frontmatter:
-   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (e.g. `[ai-news, newsletter]` — use `ai-news` for news roundups, `newsletter` for hands-on technical notes)
-   - Optional: `image` (path to a custom OG image in `public/`), `draft: true` (hides the post until you remove it)
-   - Issue numbers are **planned** (auto-assigned oldest = Issue #1); do not add an `issue` field today.
+   - `title`, `date` (`YYYY-MM-DD`), `summary` (1–2 sentences, used for SEO), `tags` (free-form, any topic, e.g. `[ai, tutorial]`)
+   - Optional: `image` (path to a custom OG image in `public/`), `draft: true` (hides the article until you remove it)
 3. Write the body in Markdown (headings, code blocks, tables, quotes all supported).
-4. Preview with `npm run dev` → `http://localhost:5173/blog/your-slug/`.
+4. Preview with `npm run dev` → `http://localhost:5173/articles/your-slug/`.
 5. Publish with `npm run deploy`. The RSS feed (`/rss.xml`) and sitemap regenerate automatically on every build. RSS is the subscription channel — there is no email signup on the static site.
 
 > After deploying, submit `https://dheerajreddybhumanapalli.github.io/sitemap.xml` in Google Search Console and Bing Webmaster Tools so new posts get indexed.
 
-### Contact info
+### Contact info and socials
 
-Edit the `contactInfo` array in `components/Contact.tsx`.
+Edit `socials` and `SITE_EMAIL` in `data/site.ts` (used by Hero, Contact, and Footer). Phone details live in the `contactMethods` array in `components/Contact.tsx`.
 
 ### Hero section
 
@@ -281,15 +284,14 @@ Edit the `<SEO ... />` props in `src/pages/` (per-route) and the defaults in `in
 
 ---
 
-## Roadmap (personal site + newsletter)
+## Roadmap (personal site + articles)
 
-Personal site: **keep as-is** — content edits only (`data/portfolio.ts`, `Hero`, `Contact`, `resume.pdf`).
+Personal site: content edits only (`data/portfolio.ts`, `data/site.ts`, `resume.pdf`).
 
-Newsletter feed (planned, all static-export compatible):
+Articles backlog (all static-hosting compatible):
 
-- **Phase 1 — newsletter feed:** auto issue numbers (oldest = #1) in `lib/posts.ts`; Issue badges on cards + post pages; year-grouped archive on `/blog`; rebrand UI labels Blog → Newsletter (keep `/blog` URLs + RSS path); "Latest issues" teaser on home; RSS channel copy → newsletter.
-- **Phase 2 — reader experience:** reading progress bar + table of contents, code-block copy button, breadcrumbs, default OG social image fallback.
-- **Phase 3 — discovery:** featured/pinned issue, richer footer, search shortcut + result counts, theme-color meta + touch icon.
+- **Reader experience:** table of contents on article pages, code-block copy button, breadcrumbs, default OG social image fallback.
+- **Discovery:** featured/pinned article, search shortcut + result counts, `apple-touch-icon.png`.
 - **Non-goals while on GitHub Pages static hosting:** email subscriptions/backend, comments, view counts/likes, API routes/server actions/middleware. Email would require an external service (e.g. Buttondown/Substack embed) — RSS stays the subscription channel unless that decision changes.
 
 ---

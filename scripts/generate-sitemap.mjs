@@ -1,13 +1,13 @@
 /**
- * Writes dist/sitemap.xml (and dist/robots.txt) from the generated post catalog.
- * Runs after `vite build` — replaces the old Next.js `app/sitemap.ts`.
+ * Writes dist/sitemap.xml (and dist/robots.txt) from the generated article catalog.
+ * Runs after `vite build` + prerender.
  */
 import fs from "node:fs";
 import path from "node:path";
 
 const SITE_URL = "https://dheerajreddybhumanapalli.github.io";
 const DIST_DIR = path.join(process.cwd(), "dist");
-const POSTS_JSON = path.join(process.cwd(), "lib", "posts-generated.json");
+const ARTICLES_JSON = path.join(process.cwd(), "lib", "articles-generated.json");
 
 function escapeXml(value) {
   return String(value)
@@ -17,25 +17,25 @@ function escapeXml(value) {
     .replace(/"/g, "&quot;");
 }
 
-let posts = [];
+let articles = [];
 try {
-  posts = JSON.parse(fs.readFileSync(POSTS_JSON, "utf8"));
+  articles = JSON.parse(fs.readFileSync(ARTICLES_JSON, "utf8"));
 } catch {
-  posts = [];
+  articles = [];
 }
 
-const tags = [...new Set(posts.flatMap((p) => p.tags ?? []))].sort();
+const tags = [...new Set(articles.flatMap((p) => p.tags ?? []))].sort();
 const today = new Date().toISOString().slice(0, 10);
 
 const urls = [
   { loc: `${SITE_URL}/`, lastmod: today },
-  { loc: `${SITE_URL}/blog/`, lastmod: today },
-  ...posts.map((post) => ({
-    loc: `${SITE_URL}/blog/${post.slug}/`,
+  { loc: `${SITE_URL}/articles/`, lastmod: today },
+  ...articles.map((post) => ({
+    loc: `${SITE_URL}/articles/${post.slug}/`,
     lastmod: post.date,
   })),
   ...tags.map((tag) => ({
-    loc: `${SITE_URL}/blog/tag/${tag}/`,
+    loc: `${SITE_URL}/articles/tag/${tag}/`,
     lastmod: today,
   })),
 ];

@@ -18,7 +18,7 @@ git pull origin master
 npm run deploy
 ```
 
-This runs `predeploy` → `npm run build` (full pipeline: posts catalog, RSS,
+This runs `predeploy` → `npm run build` (full pipeline: articles catalog, RSS,
 Vite build, per-route prerender, sitemap), then `gh-pages -d dist --nojekyll`.
 `Published` means success; allow 1–2 minutes for Pages to update.
 
@@ -30,8 +30,10 @@ Jekyll over them.
 
 This is a user site (`<username>.github.io`), served from the domain root, so
 Vite `base` is `"/"` and no sub-path handling is needed. Because prerender
-emits a real HTML file per route (`/blog/`, `/blog/:slug/`,
-`/blog/tag/:tag/`), direct URLs resolve without server rewrites. Paths with
+emits a real HTML file per route (`/articles/`, `/articles/:slug/`,
+`/articles/tag/:tag/`), direct URLs resolve without server rewrites. Old
+`/blog/*` paths serve meta-refresh redirect shims to their `/articles/*`
+equivalents. Paths with
 no prerendered file fall back to `dist/404.html`, which boots the SPA router
 (`*` → `NotFound` page).
 
@@ -42,7 +44,7 @@ npm run build
 npm run preview   # serves dist/, default http://localhost:4173/
 ```
 
-Verify a post page, a tag page, `/rss.xml`, and `/sitemap.xml` before
+Verify an article page, a tag page, `/rss.xml`, and `/sitemap.xml` before
 deploying.
 
 ## When Pages shows old content
