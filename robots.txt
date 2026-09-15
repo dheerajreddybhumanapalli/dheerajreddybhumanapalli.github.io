@@ -1,5 +1,3 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
-
+Allow: /
 Sitemap: https://dheerajreddybhumanapalli.github.io/sitemap.xml
