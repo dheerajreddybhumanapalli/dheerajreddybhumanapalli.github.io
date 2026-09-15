@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { assetPath } from "@/lib/utils";
 
 export function Footer() {
@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="border-t border-border py-8 text-center text-sm text-muted">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-6">
         <div className="flex items-center gap-4">
-          <Link href="/blog" className="transition-colors hover:text-foreground">
+          <Link to="/blog" className="transition-colors hover:text-foreground">
             Blog
           </Link>
           <a

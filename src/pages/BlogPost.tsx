@@ -1,72 +1,28 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
 import { ShareButtons } from "@/components/ShareButtons";
 import { PostNav } from "@/components/PostNav";
+import { SEO } from "@/components/SEO";
 import { formatPostDate } from "@/components/BlogCard";
 import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/posts";
+import { NotFound } from "./NotFound";
 
 const SITE_URL = "https://dheerajreddybhumanapalli.github.io";
 
-export function generateStaticParams() {
-  const posts = getAllPosts();
-  // Static export requires at least one param. When every post is a draft,
-  // this placeholder builds a page that 404s (see notFound() below) and is
-  // never linked from the listing or sitemap.
-  if (posts.length === 0) return [{ slug: "__no_posts__" }];
-  return posts.map((post) => ({ slug: post.slug }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getPostBySlug(slug);
-  if (!post) return { title: "Post not found" };
-  const url = `${SITE_URL}/blog/${post.slug}/`;
-  const images = post.image ? [{ url: post.image }] : undefined;
-  return {
-    title: `${post.title} | Dheeraj Reddy Bhumanapalli`,
-    description: post.summary,
-    alternates: { canonical: url },
-    openGraph: {
-      title: post.title,
-      description: post.summary,
-      url,
-      type: "article",
-      publishedTime: post.date,
-      tags: post.tags,
-      images,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.summary,
-      images,
-    },
-  };
-}
-
-export default async function BlogPost({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const post = await getPostBySlug(slug);
-  if (!post) notFound();
+export function BlogPost() {
+  const { slug = "" } = useParams<{ slug: string }>();
+  const post = getPostBySlug(slug);
+  if (!post) return <NotFound />;
 
   const posts = getAllPosts();
   const index = posts.findIndex((p) => p.slug === slug);
   const prev = index > 0 ? posts[index - 1] : null;
   const next = index >= 0 && index < posts.length - 1 ? posts[index + 1] : null;
   const related = getRelatedPosts(slug);
+  const url = `${SITE_URL}/blog/${post.slug}/`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -79,21 +35,27 @@ export default async function BlogPost({
       name: "Dheeraj Reddy Bhumanapalli",
       url: SITE_URL,
     },
-    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}/`,
+    mainEntityOfPage: url,
     keywords: post.tags.join(", "),
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <SEO
+        title={`${post.title} | Dheeraj Reddy Bhumanapalli`}
+        description={post.summary}
+        canonical={url}
+        type="article"
+        image={post.image}
+        publishedTime={post.date}
+        tags={post.tags}
+        jsonLd={jsonLd}
       />
       <Navbar />
       <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
         <FadeIn>
           <Link
-            href="/blog"
+            to="/blog"
             className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden /> All posts
@@ -117,7 +79,7 @@ export default async function BlogPost({
               {post.tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/blog/tag/${tag}`}
+                  to={`/blog/tag/${tag}`}
                   className="rounded-full bg-card px-3 py-1 text-xs font-medium text-muted transition-colors hover:text-accent"
                 >
                   {tag}
@@ -126,10 +88,7 @@ export default async function BlogPost({
             </div>
           )}
           <div className="mt-6 border-y border-border py-4">
-            <ShareButtons
-              title={post.title}
-              url={`${SITE_URL}/blog/${post.slug}/`}
-            />
+            <ShareButtons title={post.title} url={url} />
           </div>
         </FadeIn>
         <FadeIn delay={0.1}>

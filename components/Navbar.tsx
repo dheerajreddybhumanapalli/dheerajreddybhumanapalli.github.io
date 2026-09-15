@@ -1,10 +1,7 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, Moon, Sun, X } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 import { cn, assetPath } from "@/lib/utils";
 
 const homeLinks = [
@@ -19,7 +16,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const isHome = pathname === "/";
 
   useEffect(() => {
@@ -95,7 +92,7 @@ export function Navbar() {
             DRB
           </button>
         ) : (
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+          <Link to="/" className="text-lg font-semibold tracking-tight">
             DRB
           </Link>
         )}
@@ -123,13 +120,13 @@ export function Navbar() {
           ) : (
             <>
               <Link
-                href="/"
+                to="/"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
               >
                 Home
               </Link>
               <Link
-                href="/blog"
+                to="/blog"
                 className={cn(
                   "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   pathname.startsWith("/blog")
@@ -143,7 +140,7 @@ export function Navbar() {
           )}
           {isHome && (
             <Link
-              href="/blog"
+              to="/blog"
               className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
             >
               Blog
@@ -189,14 +186,14 @@ export function Navbar() {
             ) : (
               <>
                 <Link
-                  href="/"
+                  to="/"
                   onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted"
                 >
                   Home
                 </Link>
                 <Link
-                  href="/blog"
+                  to="/blog"
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     "rounded-lg px-3 py-2 text-left text-sm font-medium",
@@ -209,7 +206,7 @@ export function Navbar() {
             )}
             {isHome && (
               <Link
-                href="/blog"
+                to="/blog"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted"
               >

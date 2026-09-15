@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { ArrowDown, FileText } from "lucide-react";
 import { FadeIn } from "@/components/FadeIn";
 import { assetPath } from "@/lib/utils";
@@ -21,13 +20,13 @@ export function Hero() {
         <FadeIn>
           <div className="relative shrink-0">
             <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-accent/60 to-accent/20 blur-sm" />
-            <Image
+            <img
               src={assetPath("/profile_image.jpg")}
               alt="Dheeraj Reddy Bhumanapalli"
               width={160}
               height={160}
-              className="relative rounded-full border-4 border-background object-cover"
-              priority
+              loading="eager"
+              className="relative h-40 w-40 rounded-full border-4 border-background object-cover"
             />
           </div>
         </FadeIn>

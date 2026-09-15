@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Check, Copy, Mail, Phone } from "lucide-react";
 import { FadeIn } from "@/components/FadeIn";

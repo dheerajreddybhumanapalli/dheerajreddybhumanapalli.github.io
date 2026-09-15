@@ -39,11 +39,10 @@ no API routes / server actions / middleware).
 
 ## High impact (reader experience)
 
-### 4. Custom 404 page (`app/not-found.tsx`)
-- There is currently no custom `not-found.tsx`, so mistyped URLs (e.g. old
-  shared links) render Next's default page.
-- Add a branded 404 with the site's fonts/colors plus links to Home, Newsletter,
-  and the RSS feed so lost visitors stay on the site.
+### 4. Custom 404 page (`src/pages/NotFound.tsx`) — done
+- Done: branded 404 with the site's fonts/colors plus a Home link; unknown
+  paths also fall back to `dist/404.html` on GitHub Pages. Could still add
+  Newsletter and RSS links so lost visitors stay on the site.
 
 ### 5. Reading progress bar + table of contents on issue pages
 - Long technical issues perform better with orientation aids.
@@ -81,7 +80,7 @@ no API routes / server actions / middleware).
 
 ### 10. Richer footer
 - Current footer is minimal. Expand to columns: sitemap (Home, Newsletter, RSS),
-  popular tag links, socials (GitHub / LinkedIn), and a "Built with Next.js"
+  popular tag links, socials (GitHub / LinkedIn), and a "Built with React"
   note.
 
 ### 11. Skip-to-content link + focus-visible styles

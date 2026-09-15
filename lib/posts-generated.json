@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Welcome to my blog",
+    "date": "2026-09-11",
+    "summary": "Why I started writing about AI news and technical newsletters — and what you can expect to find here.",
+    "tags": [
+      "newsletter"
+    ],
+    "draft": false,
+    "slug": "welcome-to-my-blog",
+    "contentHtml": "<p>I spend a lot of time exploring new AI tools — testing LLM inference setups, RAG pipelines, and agentic workflows. Until now, most of those notes lived on my machine. This blog is where I'll publish them.</p>\n<h2>What I'll write about</h2>\n<ul>\n<li><strong>AI news</strong> — noteworthy model releases, tooling updates, and ecosystem changes, with a practitioner's take.</li>\n<li><strong>Technical newsletters</strong> — hands-on notes from my own experiments: what I tried, what worked, and what didn't.</li>\n</ul>\n<h2>How this blog works</h2>\n<p>Posts are written in Markdown and the site is a fully static React export hosted on GitHub Pages, so pages load fast and every post gets its own shareable URL with an RSS feed at <a href=\"/rss.xml\">/rss.xml</a>.</p>\n<p>If you work with Generative AI, RAG, or LLM serving, I hope something here saves you an afternoon of debugging. Let's get into it.</p>\n",
+    "readingMinutes": 1
+  }
+]

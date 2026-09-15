@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import type { PostMeta } from "@/lib/posts";

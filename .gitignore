@@ -6,8 +6,9 @@
 # testing
 /coverage
 
+# build output (vite)
 # next.js
-/.next/
+/dist/
 /out/
 /build
 

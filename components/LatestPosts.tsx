@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { getAllPosts } from "@/lib/posts";
 import { BlogCard } from "@/components/BlogCard";
@@ -21,7 +21,7 @@ export function LatestPosts() {
       </div>
       <div className="mt-8 text-center">
         <Link
-          href="/blog"
+          to="/blog"
           className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
         >
           View all posts <ArrowRight className="h-4 w-4" aria-hidden />

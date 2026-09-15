@@ -1,22 +1,21 @@
-import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BlogList } from "@/components/BlogList";
 import { FadeIn } from "@/components/FadeIn";
+import { SEO } from "@/components/SEO";
 import { getAllPosts, getAllTags } from "@/lib/posts";
 
-export const metadata: Metadata = {
-  title: "Blog | Dheeraj Reddy Bhumanapalli",
-  description:
-    "AI news and technical newsletters by Dheeraj Reddy Bhumanapalli — hands-on notes on Generative AI, LLM inference, RAG, and agentic workflows.",
-};
-
-export default function BlogIndex() {
+export function BlogIndex() {
   const posts = getAllPosts();
   const tags = getAllTags();
 
   return (
     <>
+      <SEO
+        title="Blog | Dheeraj Reddy Bhumanapalli"
+        description="AI news and technical newsletters by Dheeraj Reddy Bhumanapalli — hands-on notes on Generative AI, LLM inference, RAG, and agentic workflows."
+        canonical="https://dheerajreddybhumanapalli.github.io/blog/"
+      />
       <Navbar />
       <main className="mx-auto max-w-5xl px-6 py-16 sm:py-20">
         <FadeIn>

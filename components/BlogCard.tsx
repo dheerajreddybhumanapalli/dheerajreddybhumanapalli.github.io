@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { CalendarDays, Clock } from "lucide-react";
 import type { PostMeta } from "@/lib/posts";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export function BlogCard({ post, className }: BlogCardProps) {
   return (
     <FadeIn className={className}>
       <Link
-        href={`/blog/${post.slug}`}
+        to={`/blog/${post.slug}`}
         className={cn(
           "group flex h-full flex-col rounded-xl border border-border bg-card p-6",
           "transition-colors hover:border-accent"
