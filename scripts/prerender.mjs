@@ -22,6 +22,7 @@ const SITE_URL = "https://dheerajreddybhumanapalli.github.io";
 const DIST_DIR = path.join(process.cwd(), "dist");
 const SHELL_PATH = path.join(DIST_DIR, "index.html");
 const ARTICLES_JSON = path.join(process.cwd(), "lib", "articles-generated.json");
+const CONTENT_DIR = path.join(process.cwd(), "public", "content", "articles");
 
 // Read the Vite shell once, before any route overwrites dist/index.html.
 const shell = fs.readFileSync(SHELL_PATH, "utf8");
@@ -41,6 +42,15 @@ try {
   articles = [];
 }
 const tags = [...new Set(articles.flatMap((p) => p.tags ?? []))].sort();
+
+/** Pre-rendered body HTML for an article (emitted by generate-articles.mjs). */
+function articleBody(slug) {
+  try {
+    return fs.readFileSync(path.join(CONTENT_DIR, `${slug}.html`), "utf8");
+  } catch {
+    return "";
+  }
+}
 
 const HOME = {
   title: "Dheeraj Reddy Bhumanapalli | AI Software Engineer",
@@ -175,7 +185,7 @@ for (const article of articles) {
     tags: article.tags,
     jsonLd,
   });
-  const snapshot = `<main><p><a href="/articles/">All articles</a></p><h1>${escapeHtml(article.title)}</h1><p><time datetime="${escapeHtml(article.date)}">${escapeHtml(article.date)}</time> · ${article.readingMinutes} min read · By Dheeraj Reddy Bhumanapalli</p><article>${article.contentHtml}</article></main>`;
+  const snapshot = `<main><p><a href="/articles/">All articles</a></p><h1>${escapeHtml(article.title)}</h1><p><time datetime="${escapeHtml(article.date)}">${escapeHtml(article.date)}</time> · ${article.readingMinutes} min read · By Dheeraj Reddy Bhumanapalli</p><article>${articleBody(article.slug)}</article></main>`;
   writeRoute(`/articles/${article.slug}`, head, snapshot);
 }
 

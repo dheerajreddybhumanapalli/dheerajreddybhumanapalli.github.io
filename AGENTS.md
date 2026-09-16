@@ -22,7 +22,7 @@ npm run deploy         # build + push dist/ to gh-pages branch
 - `src/main.tsx` — entry: `BrowserRouter` + `ThemeProvider` + `App` + `src/globals.css`.
 - `src/App.tsx` — routes: `/`, `/articles`, `/articles/:slug`, `/articles/tag/:tag`, `*` (NotFound).
 - `src/pages/` — `Home`, `ArticlesIndex`, `ArticlePage`, `TagPage`, `NotFound`. Per-route SEO via `components/SEO.tsx` (sets title/meta/canonical/JSON-LD at runtime).
-- `scripts/generate-articles.mjs` → `lib/articles-generated.json` (committed) runs on predev/prebuild; `lib/articles.ts` is a pure query layer over it (`getAllArticles` / `getArticleBySlug` / `getAllTags`) — no I/O, no `fs`.
+- `scripts/generate-articles.mjs` → `lib/articles-generated.json` (committed, metadata only) + `public/content/articles/*.html` (gitignored, per-article bodies, fetched lazily) runs on predev/prebuild; `lib/articles.ts` is a query layer over the metadata (`getAllArticles` / `getArticleBySlug` / `getAllTags`) plus `loadArticleContent()` for the viewed article's body — no I/O at import, no `fs`.
 - `scripts/generate-rss.mjs` → `public/rss.xml` (copied to `dist/` by Vite) runs on prebuild.
 - `scripts/prerender.mjs` — after `vite build`, writes one HTML file per route into `dist/` (route-specific head tags + static content snapshot into `#root`, replaced by the SPA on boot), redirect shims for the old `/blog/*` paths (meta-refresh → `/articles/*`), plus `dist/404.html` SPA fallback. This preserves direct URLs and SEO without Next.js.
 - `scripts/generate-sitemap.mjs` → `dist/sitemap.xml` + `dist/robots.txt` runs after prerender.

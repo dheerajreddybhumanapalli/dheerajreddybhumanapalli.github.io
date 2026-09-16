@@ -10,6 +10,9 @@
 /dist/
 /build
 
+# generated article bodies (derivable from content/articles/*.md)
+public/content/
+
 # typescript
 *.tsbuildinfo
 

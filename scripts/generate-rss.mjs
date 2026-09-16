@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { remark } from "remark";
+import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
 const SITE_URL = "https://dheerajreddybhumanapalli.github.io";
@@ -42,7 +43,7 @@ if (fs.existsSync(POSTS_DIR)) {
       continue;
     }
     if (data.draft === true) continue;
-    const rendered = await remark().use(remarkHtml).process(content);
+    const rendered = await remark().use(remarkGfm).use(remarkHtml).process(content);
     const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
     posts.push({
       slug,

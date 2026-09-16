@@ -1,5 +1,14 @@
 /**
- * Pre-renders content/articles/*.md to lib/articles-generated.json.
+ * Pre-renders content/articles/*.md to a metadata-only catalog plus one
+ * HTML body file per article.
+ *
+ * Outputs:
+ * - lib/articles-generated.json — metadata only (slug, title, date,
+ *   summary, tags, image, draft, readingMinutes). Imported by the client
+ *   bundle, so it must stay small no matter how many articles exist.
+ * - public/content/articles/<slug>.html — full pre-rendered body, fetched
+ *   lazily by ArticlePage. Served by Vite in dev and copied to dist/ on
+ *   build (gitignored: derivable from content/*.md).
  *
  * Runs before `vite dev` (predev) and `vite build` (prebuild) so the
  * client-side catalog in lib/articles.ts never performs I/O.
@@ -13,10 +22,12 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { remark } from "remark";
+import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "articles");
 const OUT_PATH = path.join(process.cwd(), "lib", "articles-generated.json");
+const CONTENT_DIR = path.join(process.cwd(), "public", "content", "articles");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function readingMinutesFor(text) {
@@ -73,6 +84,7 @@ function validateFrontmatter(slug, data) {
 }
 
 const articles = [];
+const bodies = new Map();
 if (fs.existsSync(POSTS_DIR)) {
   for (const fileName of fs.readdirSync(POSTS_DIR)) {
     if (!fileName.endsWith(".md") || fileName.startsWith("_")) continue;
@@ -86,11 +98,11 @@ if (fs.existsSync(POSTS_DIR)) {
     const { data, content } = matter(raw);
     const frontmatter = validateFrontmatter(slug, data);
     if (frontmatter.draft === true) continue;
-    const rendered = await remark().use(remarkHtml).process(content);
+    const rendered = await remark().use(remarkGfm).use(remarkHtml).process(content);
+    bodies.set(slug, String(rendered));
     articles.push({
       ...frontmatter,
       slug,
-      contentHtml: String(rendered),
       readingMinutes: readingMinutesFor(content),
     });
   }
@@ -99,3 +111,19 @@ articles.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
 fs.writeFileSync(OUT_PATH, `${JSON.stringify(articles, null, 2)}\n`);
 console.log(`articles: wrote ${articles.length} article(s) to lib/articles-generated.json`);
+
+// One body file per article; drop stale files from deleted/renamed slugs.
+fs.mkdirSync(CONTENT_DIR, { recursive: true });
+for (const [slug, html] of bodies) {
+  fs.writeFileSync(path.join(CONTENT_DIR, `${slug}.html`), `${html}\n`);
+}
+if (fs.existsSync(CONTENT_DIR)) {
+  const live = new Set(bodies.keys());
+  for (const fileName of fs.readdirSync(CONTENT_DIR)) {
+    if (!fileName.endsWith(".html")) continue;
+    if (!live.has(fileName.replace(/\.html$/, ""))) {
+      fs.rmSync(path.join(CONTENT_DIR, fileName));
+    }
+  }
+}
+console.log(`articles: wrote ${bodies.size} body file(s) to public/content/articles/`);

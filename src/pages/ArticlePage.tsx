@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
@@ -8,7 +9,12 @@ import { ShareButtons } from "@/components/ShareButtons";
 import { ArticleNav } from "@/components/ArticleNav";
 import { SEO } from "@/components/SEO";
 import { formatArticleDate } from "@/components/ArticleCard";
-import { getAllArticles, getArticleBySlug, getRelatedArticles } from "@/lib/articles";
+import {
+  getAllArticles,
+  getArticleBySlug,
+  getRelatedArticles,
+  loadArticleContent,
+} from "@/lib/articles";
 import { SITE_NAME, SITE_URL } from "@/data/site";
 import { NotFound } from "./NotFound";
 
@@ -18,6 +24,26 @@ export function ArticlePage() {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28 });
+  const [contentHtml, setContentHtml] = useState<string | null>(null);
+  const [contentError, setContentError] = useState(false);
+
+  useEffect(() => {
+    if (!article) return;
+    let cancelled = false;
+    setContentHtml(null);
+    setContentError(false);
+    loadArticleContent(article.slug).then(
+      (html) => {
+        if (!cancelled) setContentHtml(html);
+      },
+      () => {
+        if (!cancelled) setContentError(true);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [article?.slug]);
 
   if (!article) return <NotFound />;
 
@@ -103,10 +129,27 @@ export function ArticlePage() {
           </div>
         </FadeIn>
         <FadeIn delay={0.1}>
-          <article
-            className="post-body mt-10"
-            dangerouslySetInnerHTML={{ __html: article.contentHtml }}
-          />
+          {contentError ? (
+            <p className="mt-10 rounded-2xl border border-border bg-card/60 p-6 text-sm text-muted">
+              Couldn&apos;t load this article&apos;s content. Please check your
+              connection and try again.
+            </p>
+          ) : contentHtml === null ? (
+            <div
+              className="mt-10 animate-pulse space-y-3"
+              aria-label="Loading article content"
+            >
+              <div className="h-4 w-3/4 rounded bg-card" />
+              <div className="h-4 w-full rounded bg-card" />
+              <div className="h-4 w-5/6 rounded bg-card" />
+              <div className="h-4 w-2/3 rounded bg-card" />
+            </div>
+          ) : (
+            <article
+              className="post-body mt-10"
+              dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
+          )}
         </FadeIn>
         <ArticleNav prev={prev} next={next} related={related} />
       </main>

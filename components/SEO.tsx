@@ -44,6 +44,9 @@ export function SEO({
   tags = [],
   jsonLd,
 }: SEOProps) {
+  // Stabilize array/object deps (ArticlePage builds these inline each render).
+  const tagsKey = (tags ?? []).join("\0");
+  const jsonLdKey = jsonLd ? JSON.stringify(jsonLd) : "";
   useEffect(() => {
     document.title = title;
     upsertMeta("name", "description", description);
@@ -55,15 +58,31 @@ export function SEO({
       upsertMeta("property", "og:url", canonical);
     }
     if (image) upsertMeta("property", "og:image", image);
-    if (publishedTime)
-      upsertMeta("article:published_time", publishedTime, publishedTime);
+    else
+      document.head.querySelector('meta[property="og:image"]')?.remove();
+    if (publishedTime) {
+      upsertMeta("property", "article:published_time", publishedTime);
+    } else {
+      document.head
+        .querySelector('meta[property="article:published_time"]')
+        ?.remove();
+    }
+    // There can be multiple article:tag metas, so reset them on each run
+    // (upsertMeta alone would collapse them down to a single tag).
+    document.head
+      .querySelectorAll('meta[property="article:tag"]')
+      .forEach((el) => el.remove());
     for (const tag of tags) {
-      upsertMeta("property", "article:tag", tag);
+      const el = document.createElement("meta");
+      el.setAttribute("property", "article:tag");
+      el.setAttribute("content", tag);
+      document.head.appendChild(el);
     }
     upsertMeta("name", "twitter:card", "summary_large_image");
     upsertMeta("name", "twitter:title", title);
     upsertMeta("name", "twitter:description", description);
     if (image) upsertMeta("name", "twitter:image", image);
+    else document.head.querySelector('meta[name="twitter:image"]')?.remove();
 
     let jsonLdEl: HTMLScriptElement | null = null;
     if (jsonLd) {
@@ -78,7 +97,7 @@ export function SEO({
         .querySelectorAll("script[data-seo-json-ld]")
         .forEach((el) => el.remove());
     };
-  }, [title, description, canonical, type, image, publishedTime, tags, jsonLd]);
+  }, [title, description, canonical, type, image, publishedTime, tagsKey, jsonLdKey]);
 
   return null;
 }

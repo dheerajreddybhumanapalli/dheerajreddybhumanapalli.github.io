@@ -5,5 +5,165 @@
     <link>https://dheerajreddybhumanapalli.github.io/articles/</link>
     <description>Articles by Dheeraj Reddy Bhumanapalli — notes on AI, software engineering, and things worth writing down.</description>
     <language>en</language>
+    <item>
+      <title>Everything Is a Plugin: Building on DeepSeek Harness</title>
+      <link>https://dheerajreddybhumanapalli.github.io/articles/deepseek-harness/</link>
+      <guid isPermaLink="true">https://dheerajreddybhumanapalli.github.io/articles/deepseek-harness/</guid>
+      <pubDate>Fri, 11 Sep 2026 00:00:00 GMT</pubDate>
+      <description>A hands-on walkthrough of an agent harness where every capability — the model, the tools, even the agent loop — is a swappable plugin.</description>
+      <content:encoded><![CDATA[<blockquote>
+<p><strong>TL;DR</strong> — DeepSeek Harness (<code>dsh</code>) is an open-source agent harness built on the "everything-is-a-plugin" idea. There is no locked-in core: the model adapter, the tool registry, the session log, and the agent loop are all plugins you can swap, replace, or extend. I ran it end-to-end with <code>qwen3.8:27b</code>, routed the model through LiteLLM for observability, tested a homegrown browser plugin, and poked at all four presets (Standard, PTC, Minimal, Creative). Here's what it's like, and how you'd add your own capability.</p>
+</blockquote>
+<hr>
+<h2>What is DeepSeek Harness?</h2>
+<p>DeepSeek Harness is, at its core, a <strong>coding agent that you can rebuild from the inside</strong>. It boots an agent, runs it over an append-only session log, and talks to a model through tools. Under the hood it is powered by a plugin framework called <strong>Cordis</strong>.</p>
+<p>The idea that makes it different is not "an agent with a lot of tools." It's this:</p>
+<blockquote>
+<p>There is <strong>no privileged core to patch.</strong> The model adapter, the tool registry, the session log, and the agent loop itself are all Cordis plugins mounted into one shared context. You extend the harness by mounting a <em>new</em> plugin beside the others — and every registration is a <strong>reversible effect</strong> that unwinds when the plugin unloads.</p>
+</blockquote>
+<p>In other words, a "harness" here isn't a fixed product with an SDK bolted on the side. It's a <strong>composition</strong>: a tree of plugins assembled at boot, where each one registers a <em>service</em> on a shared context (<code>ctx.tools</code>, <code>ctx.llm</code>, <code>ctx.agents</code>, <code>ctx.sessions</code>, …) and other plugins discover that service by name instead of importing a specific implementation.</p>
+<p>That single design choice is what makes the rest of this possible.</p>
+<h2>Getting it running</h2>
+<p>From <code>npm</code>:</p>
+<pre><code class="language-sh">npx @deepseek-ai/dsh web
+</code></pre>
+<p>That starts a local Web UI at <a href="http://127.0.0.1:3080">http://127.0.0.1:3080</a> and opens it in your browser.</p>
+<p>From source:</p>
+<pre><code class="language-sh">git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+pnpm install
+pnpm run build
+pnpm dsh web
+</code></pre>
+<p>A running <code>dsh</code> boots a named <strong>profile</strong> — think of it as a saved plugin composition. The shipped ones are <code>web</code> (the browser app, default), <code>headless</code> (one-shot, no server), <code>sdk</code> (JSON-RPC), <code>sdk-minimal</code>, and <code>acp</code> (automation). You can even dump the exact tree your machine boots with:</p>
+<pre><code class="language-sh">dsh --profile web --dump-config
+</code></pre>
+<p>Every row it prints is a plugin you could, in principle, replace.</p>
+<h2>The part I care about most: four presets</h2>
+<p>A <strong>preset</strong> is a per-session agent composition — one file that names the tools, prompt sections, and skills a session runs with. Because each session composes independently, <strong>a single process can run several differently-shaped agents at once.</strong> Four presets ship, and they're a clean way to feel the range of what the harness can be:</p>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>What it actually is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard</strong></td>
+<td>The full coding agent: file editing, shell, file &#x26; web search, skills, plan mode, goals, subagents, and workflows.</td>
+</tr>
+<tr>
+<td><strong>PTC</strong></td>
+<td>Standard minus the general-purpose <code>workflow</code> tool. Instead, the model composes multi-step work as a <em>single TypeScript program</em> (<code>run_code</code>) generated over the tool registry — several round trips collapse into one.</td>
+</tr>
+<tr>
+<td><strong>Minimal</strong></td>
+<td>A fixed-prompt, two-tool agent: just a persistent shell and a str-replace editor. No skills, no plan mode, no subagents, no compaction.</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>Standard <strong>plus</strong> the self-referential Cordis toolset and a composition-authoring skill — the preset for <em>building other presets</em>. Treat a session on it as shell access.</td>
+</tr>
+</tbody>
+</table>
+<p>A few behaviors that surprised me in a good way:</p>
+<ul>
+<li>The <strong>default</strong> preset is a setting — you can override it per deployment or per user.</li>
+<li>A session can <strong>switch presets only while it has produced nothing</strong>. Once it's done messages or tool calls, the composition is locked for that session's life — because swapping tools mid-conversation would strand calls the new composition can't make.</li>
+<li><strong>A preset is as privileged as the plugins it names.</strong> Authoring a custom preset is a trust decision, not a cosmetic one.</li>
+</ul>
+<h2>My hands-on run</h2>
+<p>This is where it stopped being a read-me and became a "oh, it actually works" moment.</p>
+<ul>
+<li><strong>Model verified with <code>qwen3.8:27b</code>.</strong> Coding tasks completed cleanly. The most satisfying bit: after finishing an implementation, the agent ran tests, <em>found its own defects, and fixed them</em> — no errors surfaced to me.</li>
+<li><strong>Observability via LiteLLM.</strong> Because the model adapter is a plugin behind the <code>ctx.llm</code> seam, I routed requests through a LiteLLM gateway for tracing without touching the agent loop. That seam is a genuine observability hook, not a hack.</li>
+<li><strong>A custom browser plugin.</strong> I dropped in my own plugin and confirmed the extension path works beyond the shipped toolset.</li>
+<li><strong>All four presets exercised.</strong> Standard, PTC, Minimal, Creative — to confirm the per-session composition behaves exactly as the docs claim.</li>
+</ul>
+<p>The takeaway: the harness is honest about what it is. When the model, the tools, and the loop are all the same kind of thing (a plugin), "extending it" stops being a special integration and becomes just <em>composition</em>.</p>
+<h2>Adding your own capability (a plugin)</h2>
+<p>A plugin is a TypeScript module that contributes something to the shared context. The most common shape is a function named <code>apply</code> that takes a Cordis <code>Context</code>:</p>
+<pre><code class="language-ts">import type { Context } from '@deepseek-ai/cordis'
+
+export const name = 'my-plugin'          // optional label used in diagnostics
+
+export function apply(ctx: Context) {
+  // By the time this runs, everything you declared in `inject` is ready.
+  console.log('[my-plugin] loaded')
+}
+</code></pre>
+<p>You list the plugin in a <code>cordis.yml</code> (a list of entries; <code>name</code> is a module specifier — an npm package or a path):</p>
+<pre><code class="language-yaml">- name: '/absolute/path/to/my-plugin/src/plugin.ts'
+</code></pre>
+<p>A conventional layout is <code>my-plugin/src/plugin.ts</code>.</p>
+<h3>Declaring dependencies</h3>
+<p>If your plugin needs a capability — the tool registry, the LLM adapter, the agent registry — say so with <code>inject</code>. Cordis then holds your plugin <em>pending</em> until that service exists, so you never see half-initialized state, and <strong>load order in the file stops mattering</strong> (dependencies decide order, not line position):</p>
+<pre><code class="language-ts">export const name = 'my-tool-plugin'
+export const inject = ['tools']          // or ['tools', 'llm'], etc.
+</code></pre>
+<p>For a capability you <em>might</em> need, probe instead of requiring: <code>ctx.get('tools')</code>.</p>
+<h3>Three shapes, one idea</h3>
+<ol>
+<li><strong>Function</strong> — the <code>apply(ctx)</code> form above. Use this first.</li>
+<li><strong>Object</strong> — an object with a name, <code>inject</code>, and an <code>apply</code> method.</li>
+<li><strong>Class / <code>Service</code></strong> — when you need to <em>expose</em> a service that other plugins consume.</li>
+</ol>
+<pre><code class="language-ts">import { Service, type Context } from '@deepseek-ai/cordis'
+
+declare module '@deepseek-ai/cordis' {
+  interface Context { myService: MyService }   // compile-time typing
+}
+
+export class MyService extends Service {
+  static inject = ['tools']
+
+  constructor(ctx: Context) {
+    super(ctx, 'myService')                    // register under 'myService'
+    // Synchronous init here. From now on, ctx.myService works everywhere.
+  }
+}
+</code></pre>
+<p>The <code>declare module</code> block is TypeScript declaration merging — it adds <code>myService</code> to <code>Context</code> so <code>ctx.myService</code> type-checks. It generates no code; without it the service still works at runtime, you just lose type safety.</p>
+<h3>Getting it into a running harness</h3>
+<p>The fastest path is a one-off <strong>patch overlay</strong> — no rebuild, no permanent change:</p>
+<pre><code class="language-sh">pnpm dsh web --patch ./my-plugin/cordis.yml
+</code></pre>
+<p>A patch can <strong>replace</strong> an existing row (target it by <code>id</code>, swap its whole <code>config</code>) or <strong>insert</strong> new rows. Custom profiles reload these live, so you can iterate a plugin without restarting the whole app.</p>
+<pre><code class="language-yaml"># Insert a new plugin into the running composition
+- insert:
+    - id: my-plugin
+      name: '/absolute/path/to/my-plugin/src/plugin.ts'
+
+# Or replace the config of an existing row (by id)
+- id: webserver
+  config:
+    host: 127.0.0.1
+    port: 3081
+</code></pre>
+<h3>Cleanup</h3>
+<p>Because registrations are <strong>reversible effects</strong>, Cordis automatically unwinds what your plugin registered when the plugin unloads. If you open a resource and want it closed on teardown, register the cleanup:</p>
+<pre><code class="language-ts">export function apply(ctx: Context) {
+  const socket = openThing()
+  ctx.effect(() => socket.close())   // runs when this plugin unloads
+}
+</code></pre>
+<h3>One trust note</h3>
+<p>A plugin is <strong>as privileged as the services it touches.</strong> A row that publishes a service into the root realm is process-global; if only one agent should see it, it belongs inside an isolated realm. Treat a plugin that can read or mount the live runtime the same way you'd treat shell access — which is exactly how the harness' own <strong>Creative</strong> preset puts it.</p>
+<h2>Why I think this model matters</h2>
+<p>Most agent platforms hand you a strong, fixed agent and an SDK for the seams. The "everything is a plugin" stance inverts that: the agent <em>is</em> the plugin composition, so there is no "the agent" to upgrade against a vendor. Want a different model? Swap the adapter. Want a lean two-tool agent for a sandboxed context? Pick a preset. Want a capability that doesn't exist? Write ~30 lines of TypeScript and mount it.</p>
+<p>That's not a feature list — it's a different relationship with the tool. For anyone who's ever wanted to <em>understand and reshape</em> the thing doing their coding, that's the interesting part.</p>
+<h2>Get started</h2>
+<ul>
+<li>Run it: <code>npx @deepseek-ai/dsh web</code></li>
+<li>Source: <a href="https://github.com/deepseek-ai/deepseek-harness">https://github.com/deepseek-ai/deepseek-harness</a></li>
+<li>Cordis primer (the framework under <code>dsh</code>): <code>docs/cordis-primer.md</code></li>
+<li>Cordis tutorial (plugins, services, events, config): <code>docs/cordis-tutorial/</code></li>
+<li>Architecture (profiles, bundles, patches): <code>docs/architecture.md</code></li>
+</ul>
+<p><em>DeepSeek Harness is in developer preview and iterating rapidly — expect compatibility-breaking changes.</em></p>
+]]></content:encoded>
+      <category>tools</category>
+    </item>
   </channel>
 </rss>

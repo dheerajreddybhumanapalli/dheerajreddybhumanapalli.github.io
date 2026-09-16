@@ -7,7 +7,8 @@ Tailwind CSS v4. No Next.js, no backend. Hosting: GitHub Pages (`gh-pages` branc
 
 ```
 content/articles/*.md
-  ├─ scripts/generate-articles.mjs ─→ lib/articles-generated.json (committed)
+  ├─ scripts/generate-articles.mjs ─→ lib/articles-generated.json (committed, metadata only)
+  │                                     + public/content/articles/*.html (gitignored, per-article bodies)
   └─ scripts/generate-rss.mjs ──────→ public/rss.xml (committed)
                                           │
 vite build ──→ dist/ (JS/CSS + copies of public/)
@@ -48,11 +49,14 @@ for the home-section nav.
 
 ## Article data layer
 
-`lib/articles.ts` performs **no I/O** — it is a pure query layer over the
-build-time catalog in `lib/articles-generated.json`:
+`lib/articles.ts` performs **no I/O at import time** — it is a pure query layer
+over the build-time metadata catalog in `lib/articles-generated.json`, plus
+one lazy fetch for the article being viewed:
 
-- `getAllArticles()` — published articles, newest first
-- `getArticleBySlug(slug)` — full article incl. pre-rendered `contentHtml` (sync)
+- `getAllArticles()` — published article metadata, newest first
+- `getArticleBySlug(slug)` — article metadata by slug (sync, no body)
+- `loadArticleContent(slug)` — fetches `public/content/articles/<slug>.html`
+  (pre-rendered body); used by `ArticlePage` with loading/error states
 - `getAllTags()` — alphabetical tag list
 - `getRelatedArticles(slug, limit)` — overlap-ranked, excludes self
 
