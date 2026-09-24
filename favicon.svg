@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Personal monogram: emerald "D" + terminal cursor on dark rounded square.
+       Matches the site accent (#34d399 on #0b0f14) and the Navbar/Footer "D" mark. -->
+  <rect width="64" height="64" rx="14" fill="#0b0f14"/>
+  <rect x="1" y="1" width="62" height="62" rx="13" fill="none" stroke="#34d399" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="27" y="44" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="34" font-weight="700" fill="#34d399">D</text>
+  <rect x="38" y="40" width="9" height="5" rx="1.5" fill="#34d399"/>
+</svg>
