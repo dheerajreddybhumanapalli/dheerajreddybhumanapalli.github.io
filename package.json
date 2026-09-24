@@ -3,11 +3,12 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/generate-articles.mjs",
+    "predev": "node scripts/generate-articles.mjs && node scripts/generate-rss.mjs",
     "dev": "vite",
     "prebuild": "node scripts/generate-articles.mjs && node scripts/generate-rss.mjs",
     "build": "vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
     "preview": "vite preview",
+    "prelint": "node scripts/generate-articles.mjs",
     "lint": "tsc --noEmit",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --nojekyll"

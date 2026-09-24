@@ -16,26 +16,87 @@ export interface SkillGroup {
 
 export const about: string[] = [
   "I'm an AI Software Engineer working at the intersection of Generative AI and production software. My day-to-day spans RAG pipelines, agentic workflows with LangGraph, and benchmarking LLM inference under real GPU constraints.",
-  "Before AI took over my calendar, I built large-scale data platforms — ingestion pipelines over a billion records, Elasticsearch at scale, and the unglamorous work of keeping production systems alive. That grounding shapes how I build AI systems: evaluated, observable, and shippable.",
+  "I joined as an AI engineer, and alongside the AI work I build production software — ingestion pipelines over a billion records, Elasticsearch at scale, and the unglamorous work of keeping production systems alive. That grounding shapes how I build AI systems: evaluated, observable, and shippable.",
 ];
 
 export const skillGroups: SkillGroup[] = [
-  {
-    label: "Languages",
-    skills: ["Python", "TypeScript", "SQL", "Bash"],
-  },
-  {
-    label: "AI / ML",
-    skills: ["LangGraph", "LangChain", "RAG", "PyTorch", "Hugging Face", "vLLM", "FAISS", "ChromaDB"],
-  },
-  {
-    label: "Backend",
-    skills: ["FastAPI", "Django", "React", "Celery", "RabbitMQ", "PostgreSQL"],
-  },
-  {
-    label: "Data & Infra",
-    skills: ["Elasticsearch", "AWS", "Docker", "Selenium", "Playwright", "Prometheus", "Grafana"],
-  },
+{
+  label: "Languages",
+  skills: ["Python", "C++", "JavaScript", "SQL"],
+},
+{
+  label: "Generative AI & LLMs",
+  skills: [
+    "Generative AI",
+    "LLM Applications",
+    "Agentic AI",
+    "RAG",
+    "Advanced Retrieval Techniques",
+    "LangGraph",
+    "LangChain",
+    "LLM Inference (vLLM)",
+    "Prompt Caching",
+    "PyTorch",
+    "TensorFlow",
+  ],
+},
+{
+  label: "Backend",
+  skills: [
+    "FastAPI",
+    "Django",
+    "Celery",
+    "REST APIs",
+    "Asynchronous Processing",
+  ],
+},
+{
+  label: "Web Scraping & Automation",
+  skills: ["Playwright", "Selenium"],
+},
+{
+  label: "Frontend",
+  skills: ["React"],
+},
+{
+  label: "Database & Messaging",
+  skills: [
+    "PostgreSQL",
+    "Elasticsearch",
+    "Redis",
+    "RabbitMQ",
+  ],
+},
+{
+  label: "Cloud & Infrastructure",
+  skills: [
+    "AWS",
+    "Docker",
+    "Kubernetes",
+  ],
+},
+{
+  label: "Observability & LLM Evaluation",
+  skills: [
+    "LangSmith",
+    "Langfuse",
+    "Arize AI",
+    "Traceloop",
+    "Prometheus",
+    "Grafana",
+  ],
+},
+{
+  label: "AI Coding Tools",
+  skills: [
+    "Cursor",
+    "Claude Code",
+    "GitHub Copilot",
+    "OpenCode",
+    "CommandCode",
+    "DeepSeek Harness",
+  ],
+},
 ];
 
 export const projects: CardItem[] = [
@@ -78,7 +139,7 @@ export const experiences: CardItem[] = [
     title: "Paltech Consulting Private Limited",
     roles: [
       {
-        designation: "Software Engineer – Python Full Stack & AI",
+        designation: "AI Software Engineer – Python Full Stack & AI",
         duration: "Jul 2024 – Present",
         description: [
           "Built enterprise backend and data-processing workflows using Python, Django, FastAPI, Elasticsearch, Celery, RabbitMQ, AWS, and Docker for client-facing products and large-scale ingestion systems.",

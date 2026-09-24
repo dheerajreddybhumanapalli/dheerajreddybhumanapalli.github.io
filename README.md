@@ -191,7 +191,7 @@ dheerajreddybhumanapalli.github.io/
 │   └── generate-sitemap.mjs # Writes dist/sitemap.xml + dist/robots.txt
 ├── lib/
 │   ├── articles.ts         # Query layer over articles-generated.json (no I/O)
-│   ├── articles-generated.json # Build-time article catalog (committed)
+│   ├── articles-generated.json # Build-time article catalog (gitignored, regenerated)
 │   └── utils.ts            # cn(), assetPath(), basePath helpers
 ├── public/                 # Static assets (copied to dist/ on build)
 │   ├── profile_image.jpg

@@ -9,7 +9,7 @@ export function About() {
         <FadeIn>
           <SectionHeading
             title="About"
-            subtitle="Engineer first, AI specialist by practice."
+            subtitle="AI engineer with strong software fundamentals."
           />
         </FadeIn>
         <FadeIn>

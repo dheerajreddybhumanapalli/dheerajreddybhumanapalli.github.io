@@ -55,13 +55,11 @@ export function Hero() {
                 {SITE_ROLE}
                 <span aria-hidden className="text-border">·</span>
                 <span className="inline-flex items-center gap-1 text-base">
-                  <MapPin className="h-4 w-4" aria-hidden /> India
+                  <MapPin className="h-4 w-4" aria-hidden /> Hyderabad, Telangana, India
                 </span>
               </p>
               <p className="mx-auto mt-4 max-w-xl leading-relaxed text-muted sm:mx-0">
-                Building Generative AI solutions and production software — RAG,
-                agentic workflows, and LLM inference — with Python, FastAPI,
-                Django, PyTorch, and AWS.
+                Generative AI, LLMs, RAG & Agentic AI | LLM Inference, Evaluation & Observability | Python Full Stack
               </p>
             </FadeIn>
 

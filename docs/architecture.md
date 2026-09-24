@@ -7,9 +7,9 @@ Tailwind CSS v4. No Next.js, no backend. Hosting: GitHub Pages (`gh-pages` branc
 
 ```
 content/articles/*.md
-  ├─ scripts/generate-articles.mjs ─→ lib/articles-generated.json (committed, metadata only)
+  ├─ scripts/generate-articles.mjs ─→ lib/articles-generated.json (gitignored, metadata only)
   │                                     + public/content/articles/*.html (gitignored, per-article bodies)
-  └─ scripts/generate-rss.mjs ──────→ public/rss.xml (committed)
+  └─ scripts/generate-rss.mjs ──────→ public/rss.xml (gitignored)
                                           │
 vite build ──→ dist/ (JS/CSS + copies of public/)
   ├─ scripts/prerender.mjs ─────────→ dist/**/index.html + dist/404.html (+ /blog/* redirect shims)
@@ -17,7 +17,7 @@ vite build ──→ dist/ (JS/CSS + copies of public/)
 ```
 
 `npm run build` runs the whole chain (`prebuild` → `vite build` → prerender →
-sitemap). `npm run dev` runs `generate-articles` first (`predev`), then Vite.
+sitemap). `npm run dev` regenerates the article catalog + RSS first (`predev`), then Vite.
 
 ## Rendering model
 
