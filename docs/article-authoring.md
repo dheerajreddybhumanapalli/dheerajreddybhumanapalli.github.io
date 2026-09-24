@@ -42,8 +42,8 @@ flag.
 
 | Artifact | Generator | Trigger |
 |----------|-----------|---------|
-| `lib/articles-generated.json` | `generate-articles.mjs` | `predev`, `prebuild` |
-| `public/rss.xml` | `generate-rss.mjs` | `prebuild` |
+| `lib/articles-generated.json` | `generate-articles.mjs` | `predev`, `prebuild`, `prelint` |
+| `public/rss.xml` | `generate-rss.mjs` | `predev`, `prebuild` |
 | `dist/**/index.html`, `dist/404.html` | `prerender.mjs` | after `vite build` |
 | `dist/sitemap.xml`, `dist/robots.txt` | `generate-sitemap.mjs` | after prerender |
 

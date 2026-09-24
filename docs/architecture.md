@@ -64,8 +64,9 @@ Validation (filename = slug, required frontmatter) lives in
 `scripts/generate-articles.mjs`, which throws on violations. See
 [article-authoring.md](article-authoring.md).
 
-The catalog JSON is committed so a fresh clone typechecks and builds without
-running scripts first; `predev`/`prebuild` regenerate it anyway.
+The catalog JSON and per-article bodies are gitignored — `predev` /
+`prebuild` / `prelint` regenerate them, so a fresh clone just runs
+`npm run dev` (or `npm run lint` / `npm run build`) first.
 
 ## Theming
 
@@ -78,13 +79,14 @@ before first paint to avoid a flash. Dark mode styling needs Tailwind's
 ## Content & site data
 
 - `data/portfolio.ts` — projects/experience/skills/about (`CardItem`/`Role`/`SkillGroup`). Edit content here, not in components.
-- `data/site.ts` — `SITE_URL`, name, role, email, social links, resume/RSS URLs. Social URLs are placeholders — ask the user for real ones before publishing.
+- `data/site.ts` — `SITE_URL`, name, role, email, social links, resume/RSS URLs.
 - `components/SocialLinks.tsx` — GitHub/LinkedIn icon buttons.
 
 ## Static assets
 
-- `public/` is copied verbatim to `dist/` by Vite (`resume.pdf`,
-  `profile_image.jpg`, `favicon.ico`, `rss.xml`, `.nojekyll`).
+- `public/` is copied verbatim to `dist/` by Vite (`favicon.svg`,
+  `profile_image.jpg`, `resume.pdf`, generated `rss.xml`, generated
+  `content/articles/*.html`, `.nojekyll`).
 - In code, always reference static URLs via `assetPath("/...")` from
   `lib/utils.ts` so a future Vite `base` keeps working. Base is currently
   `"/"` (user site served from domain root).
